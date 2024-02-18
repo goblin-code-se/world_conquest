@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3 uid="uid://c67mjk5exq6xf"]
+
+[ext_resource type="Script" path="res://scripts/territory.gd" id="1_if7cs"]
+[ext_resource type="Texture2D" uid="uid://du353aamsl7h0" path="res://assets/neutral.png" id="1_kl664"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_d0qa0"]
+radius = 3400.0
+
+[node name="Territory" type="Area2D"]
+position = Vector2(55, 50)
+scale = Vector2(0.01, 0.01)
+script = ExtResource("1_if7cs")
+who_owns = 2
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(2, 2)
+texture = ExtResource("1_kl664")
+
+[node name="HoverInfo" type="Label" parent="."]
+visible = false
+offset_left = 2000.0
+offset_top = 1200.0
+offset_right = 6254.0
+offset_bottom = 3385.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 800
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_d0qa0")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

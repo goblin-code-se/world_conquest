@@ -1,12 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://bosnsts0pvkbh"]
+[gd_scene load_steps=5 format=3 uid="uid://dslyhke0je67t"]
 
 [ext_resource type="Script" path="res://scripts/dice_scene.gd" id="1_uybp4"]
-[ext_resource type="PackedScene" uid="uid://dlm8eqwttvxlw" path="res://dice.tscn" id="2_ic7og"]
+[ext_resource type="PackedScene" uid="uid://c11exbtd62qxw" path="res://dice.tscn" id="2_ic7og"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ixrv1"]
 
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_04vn0"]
-data = PackedVector3Array(1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0, -1, 1, 0, -1)
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pd10n"]
 
 [node name="Main" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0832921, -1.36469, -0.0949917)
@@ -20,7 +19,7 @@ mesh = SubResource("PlaneMesh_ixrv1")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
 transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0)
-shape = SubResource("ConcavePolygonShape3D_04vn0")
+shape = SubResource("WorldBoundaryShape3D_pd10n")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.9082, 22.9531)

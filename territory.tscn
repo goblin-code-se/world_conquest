@@ -23,7 +23,7 @@ offset_top = 1200.0
 offset_right = 6254.0
 offset_bottom = 3385.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 800
+theme_override_font_sizes/font_size = 1000
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_d0qa0")

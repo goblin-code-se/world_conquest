@@ -1,8 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://c11exbtd62qxw"]
+[gd_scene load_steps=8 format=3 uid="uid://dwst3e7xkiwi2"]
 
+[ext_resource type="Script" path="res://scripts/diceAngle.gd" id="1_7aiqy"]
 [ext_resource type="Texture2D" uid="uid://cbu2225xh2var" path="res://assets/die_palette.png" id="1_suf2l"]
-[ext_resource type="Script" path="res://scripts/dice.gd" id="1_u00c7"]
-[ext_resource type="PackedScene" uid="uid://c5h36cs0xxcx4" path="res://dice_raycast.tscn" id="3_d8gwj"]
+[ext_resource type="PackedScene" path="res://dice_raycast.tscn" id="3_d8gwj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_b0i7f"]
 size = Vector3(2, 2, 2)
@@ -54,7 +54,7 @@ gravity_scale = 0.5
 continuous_cd = true
 max_contacts_reported = 10
 contact_monitor = true
-script = ExtResource("1_u00c7")
+script = ExtResource("1_7aiqy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_b0i7f")

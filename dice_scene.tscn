@@ -6,9 +6,10 @@
 [sub_resource type="PlaneMesh" id="PlaneMesh_ixrv1"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_pd10n"]
+margin = 0.2
 
 [node name="Main" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0832921, -1.36469, -0.0949917)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.083, 0, 0)
 script = ExtResource("1_uybp4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
@@ -22,7 +23,7 @@ transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0)
 shape = SubResource("WorldBoundaryShape3D_pd10n")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.9082, 22.9531)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.7)
 
 [node name="Dice" parent="." instance=ExtResource("2_ic7og")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.3085, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

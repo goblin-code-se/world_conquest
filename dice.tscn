@@ -2,10 +2,12 @@
 
 [ext_resource type="Script" path="res://scripts/diceAngle.gd" id="1_7aiqy"]
 [ext_resource type="Texture2D" uid="uid://cbu2225xh2var" path="res://assets/die_palette.png" id="1_suf2l"]
-[ext_resource type="PackedScene" path="res://dice_raycast.tscn" id="3_d8gwj"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_owmve"]
+bounce = 0.6
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_b0i7f"]
-size = Vector3(2, 2, 2)
+size = Vector3(0.12, 0.12, 0.12)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5iqp6"]
 resource_name = "Material"
@@ -49,50 +51,22 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_k5ima")
 
 [node name="Dice" type="RigidBody3D"]
-mass = 0.5
+mass = 0.1
+physics_material_override = SubResource("PhysicsMaterial_owmve")
 gravity_scale = 0.5
 continuous_cd = true
 max_contacts_reported = 10
 contact_monitor = true
 script = ExtResource("1_7aiqy")
+rotation_power = 12.0
+rotation_minimum = 4.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_b0i7f")
 
 [node name="Cube" type="MeshInstance3D" parent="CollisionShape3D"]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
 mesh = SubResource("ArrayMesh_k5elw")
 skeleton = NodePath("")
-
-[node name="Raycast" type="Node3D" parent="."]
-
-[node name="DiceRaycast1" parent="Raycast" instance=ExtResource("3_d8gwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-target_position = Vector3(0, -1, 0)
-opposite_side = 6
-
-[node name="DiceRaycast2" parent="Raycast" instance=ExtResource("3_d8gwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-target_position = Vector3(-1, 0, 0)
-opposite_side = 5
-
-[node name="DiceRaycast3" parent="Raycast" instance=ExtResource("3_d8gwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
-target_position = Vector3(0, 0, -1)
-opposite_side = 4
-
-[node name="DiceRaycast4" parent="Raycast" instance=ExtResource("3_d8gwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
-target_position = Vector3(0, 0, 1)
-opposite_side = 3
-
-[node name="DiceRaycast5" parent="Raycast" instance=ExtResource("3_d8gwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-target_position = Vector3(1, 0, 0)
-opposite_side = 2
-
-[node name="DiceRaycast6" parent="Raycast" instance=ExtResource("3_d8gwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-target_position = Vector3(0, 1, 0)
-opposite_side = 1
 
 [connection signal="sleeping_state_changed" from="." to="." method="_on_sleeping_state_changed"]

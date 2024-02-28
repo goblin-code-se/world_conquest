@@ -1,12 +1,67 @@
-[gd_scene load_steps=3 format=3 uid="uid://c13dqf1pfcj0l"]
+[gd_scene load_steps=3 format=3 uid="uid://c6fbusm8pft11"]
 
-[ext_resource type="Script" path="res://ui.gd" id="1_nb1vi"]
-[ext_resource type="Texture2D" uid="uid://8syxicchssd6" path="res://assets/space background.png" id="2_ajk1x"]
+[ext_resource type="Texture2D" uid="uid://8syxicchssd6" path="res://assets/space background.png" id="1_g3ay4"]
+[ext_resource type="Script" path="res://ui.gd" id="1_un0fq"]
 
-[node name="UI" type="CanvasLayer"]
-script = ExtResource("1_nb1vi")
+[node name="CanvasLayer" type="CanvasLayer"]
+script = ExtResource("1_un0fq")
 
-[node name="TurnTimer" type="Timer" parent="."]
+[node name="ButtonTexture" type="TextureRect" parent="."]
+anchors_preset = -1
+anchor_left = 0.784
+anchor_top = 0.651
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -0.168045
+offset_top = 0.151985
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("1_g3ay4")
+expand_mode = 3
+
+[node name="Button" type="Button" parent="ButtonTexture"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.085
+anchor_top = 0.297
+anchor_right = 0.851
+anchor_bottom = 0.745
+offset_left = 27.835
+offset_top = 17.878
+offset_right = -16.899
+offset_bottom = -22.37
+theme_override_font_sizes/font_size = 32
+text = "End Turn"
+
+[node name="TurnCounterTexture" type="TextureRect" parent="."]
+anchors_preset = -1
+anchor_left = 0.378
+anchor_right = 0.622
+anchor_bottom = 0.343
+offset_left = 0.543976
+offset_right = 0.455956
+offset_bottom = -0.264016
+grow_horizontal = 2
+texture = ExtResource("1_g3ay4")
+expand_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="TurnCountdown" type="Label" parent="TurnCounterTexture"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.097
+anchor_top = 0.296
+anchor_right = 0.856
+anchor_bottom = 0.714
+offset_left = 20.607
+offset_top = 6.448
+offset_right = -21.664
+offset_bottom = -5.81801
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
 
 [node name="Tallies" type="Label" parent="."]
 anchors_preset = 4
@@ -18,56 +73,6 @@ offset_bottom = 11.5
 grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 
-[node name="TurnCounterTexture" type="TextureRect" parent="."]
-offset_left = 434.0
-offset_top = -48.0
-offset_right = 694.0
-offset_bottom = 176.0
-texture = ExtResource("2_ajk1x")
-expand_mode = 2
-
-[node name="TurnCountdown" type="Label" parent="TurnCounterTexture"]
-light_mask = 2
-visibility_layer = 2
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.227
-anchor_top = 0.286
-anchor_right = 0.723
-anchor_bottom = 0.679
-offset_left = -0.0200034
-offset_top = -0.064003
-offset_right = 0.0199871
-offset_bottom = -0.0960045
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 64
-text = "0:00"
-horizontal_alignment = 1
-
-[node name="ButtonTexture" type="TextureRect" parent="."]
-offset_left = 836.0
-offset_top = 427.0
-offset_right = 1166.0
-offset_bottom = 683.0
-texture = ExtResource("2_ajk1x")
-expand_mode = 2
-
-[node name="Button" type="Button" parent="ButtonTexture"]
-light_mask = 2
-visibility_layer = 2
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.84
-anchor_top = 0.836
-anchor_right = 0.967
-anchor_bottom = 0.918
-offset_left = -186.2
-offset_top = -108.016
-offset_right = -82.11
-offset_bottom = -76.008
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_font_sizes/font_size = 32
-text = "End Turn"
+[node name="TurnTimer" type="Timer" parent="."]
 
 [connection signal="pressed" from="ButtonTexture/Button" to="." method="_on_button_pressed"]

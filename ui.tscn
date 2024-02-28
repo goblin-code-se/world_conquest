@@ -18,7 +18,7 @@ offset_bottom = 11.5
 grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="TurnCounterTexture" type="TextureRect" parent="."]
 offset_left = 434.0
 offset_top = -48.0
 offset_right = 694.0
@@ -26,7 +26,7 @@ offset_bottom = 176.0
 texture = ExtResource("2_ajk1x")
 expand_mode = 2
 
-[node name="TurnCountdown" type="Label" parent="TextureRect"]
+[node name="TurnCountdown" type="Label" parent="TurnCounterTexture"]
 light_mask = 2
 visibility_layer = 2
 layout_mode = 1
@@ -44,7 +44,7 @@ theme_override_font_sizes/font_size = 64
 text = "0:00"
 horizontal_alignment = 1
 
-[node name="TextureRect2" type="TextureRect" parent="."]
+[node name="ButtonTexture" type="TextureRect" parent="."]
 offset_left = 836.0
 offset_top = 427.0
 offset_right = 1166.0
@@ -52,7 +52,7 @@ offset_bottom = 683.0
 texture = ExtResource("2_ajk1x")
 expand_mode = 2
 
-[node name="Button" type="Button" parent="TextureRect2"]
+[node name="Button" type="Button" parent="ButtonTexture"]
 light_mask = 2
 visibility_layer = 2
 layout_mode = 1
@@ -70,4 +70,4 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 32
 text = "End Turn"
 
-[connection signal="pressed" from="TextureRect2/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="ButtonTexture/Button" to="." method="_on_button_pressed"]

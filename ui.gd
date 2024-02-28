@@ -8,8 +8,11 @@ func _ready():
 	for i in range(0, player_count):
 		$Tallies.text += "Player {num}'s troops: {troops}\n".format({"num":i, "troops":troop_count})
 
-func _process(_delta):
-	$TurnCounterTexture/TurnCountdown.text = str($TurnTimer.get_time_left()/60)+":"+str(int($TurnTimer.get_time_left())%60) # div by 60 to get minutes, mod by 60 to get mins
+func _process(_delta): # checks if exactly to a minute, if so, then adds extra zero so that "5:0" is corrected to "5:00"
+	if int($TurnTimer.get_time_left()) % 60 == 0:
+		$TurnCounterTexture/TurnCountdown.text = str(int($TurnTimer.get_time_left())/60)+":"+str(int($TurnTimer.get_time_left())%60)+"0"
+	else:
+		$TurnCounterTexture/TurnCountdown.text = str(int($TurnTimer.get_time_left())/60)+":"+str(int($TurnTimer.get_time_left())%60) # div by 60 to get minutes, mod by 60 to get seconds
 
 func end_turn():
 	$TurnTimer.stop() 

@@ -29,3 +29,14 @@ func add_edge(v: int, w: int) -> void:
 
 func connected(v: int,w: int) -> bool:
 	return(v in _graph[w])
+
+
+func dfs(start_node: int) -> Array:
+	var edges = [start_node]
+	var checked = 0
+	while checked < edges.size():
+		for edge in _graph[edges[checked]]:
+			if !(edge in edges):
+				edges.append(edge)
+		checked += 1
+	return edges

@@ -1,31 +1,31 @@
 class_name Graph
 	
-var _graph
-var _vertices
-var _edges
+var _graph: Dictionary
+var _nodes: Array
+var _edges: Array
 
-func _init(vertices: Array):
+func _init(nodes: Array):
 	
 	_edges = []
-	_vertices = vertices
+	_nodes = nodes
 	_graph = {}
-	for i in len(vertices):
+	for i in len(nodes):
 		_graph[i] = []
+		nodes[i].set_id(i)
 
-func get_vertex(index):
-	return _vertices[index]
+func get_node(index: int) -> Area2D:
+	return _nodes[index]
 
-func get_graph():
+func get_graph() -> Dictionary:
 	return _graph
 
-func get_edges():
+func get_edges() -> Array:
 	return _edges
 
-func add_edge(v, w):
+func add_edge(v: int, w: int) -> void:
 	_edges.append([v,w])
 	_graph[v].append(w)
 	_graph[w].append(v)
 
-
-func connected(v,w):
+func connected(v: int,w: int) -> bool:
 	return(v in _graph[w])

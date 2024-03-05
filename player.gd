@@ -1,8 +1,11 @@
+"""
+Objects used for storing state of each player
+"""
 class_name Player
 
-var id
-var troop_count
+var _id: int
+var _troops: int
 
-func _init(id_num, troop_num):
-	id = id_num
-	troop_count = troop_num
+func _init(id: int, troops:int):
+	_id = id
+	_troops = troops

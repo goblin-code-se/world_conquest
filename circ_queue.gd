@@ -1,15 +1,19 @@
-class_name CircQueue
+"""
+Queue used for ordering of turns implemented with array
+Array contains Player objects
+"""
+class_name Queue
 
-var items
+var _players: Array[Player]
 
-func _init(num):
-	items = []
+func _init():
+	_players = []
 
-func enqueue(item):
-	items.push_back(item)
+func enqueue(item: Player):
+	_players.push_back(item)
 
-func dequeue():
-	return items.pop_front()
+func dequeue() -> Player:
+	return _players.pop_front()
 
-func peek():
-	return items.front()
+func peek() -> Player:
+	return _players.front()

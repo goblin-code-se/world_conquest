@@ -1,88 +1,98 @@
-[gd_scene load_steps=3 format=3 uid="uid://c6fbusm8pft11"]
+[gd_scene load_steps=4 format=3 uid="uid://c6fbusm8pft11"]
 
-[ext_resource type="Texture2D" uid="uid://8syxicchssd6" path="res://assets/space background.png" id="1_g3ay4"]
 [ext_resource type="Script" path="res://ui.gd" id="1_un0fq"]
+[ext_resource type="Texture2D" uid="uid://4xfqh5ab1nqp" path="res://assets/board.png" id="2_o8k87"]
+[ext_resource type="Texture2D" uid="uid://dpusb86r2xa0v" path="res://assets/neutral.png" id="2_w4001"]
 
 [node name="CanvasLayer" type="CanvasLayer"]
 script = ExtResource("1_un0fq")
 
-[node name="ButtonTexture" type="TextureRect" parent="."]
+[node name="Board" type="TextureRect" parent="."]
+offset_left = -2.0
+offset_top = -56.0
+offset_right = 1146.0
+offset_bottom = 643.0
+texture = ExtResource("2_o8k87")
+expand_mode = 1
+
+[node name="MenuBarTexture" type="TextureRect" parent="Board"]
+layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.784
-anchor_top = 0.651
+anchor_top = 0.924
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -0.168045
-offset_top = 0.151985
-grow_horizontal = 0
+offset_left = -199.0
+offset_top = 0.123983
+offset_right = 208.0
+offset_bottom = 29.0
+grow_horizontal = 2
 grow_vertical = 0
-texture = ExtResource("1_g3ay4")
+texture = ExtResource("2_w4001")
 expand_mode = 3
 
-[node name="Button" type="Button" parent="ButtonTexture"]
+[node name="Button" type="Button" parent="Board/MenuBarTexture"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.085
-anchor_top = 0.297
-anchor_right = 0.851
-anchor_bottom = 0.745
-offset_left = 27.835
-offset_top = 17.878
-offset_right = -16.899
-offset_bottom = -22.37
-theme_override_font_sizes/font_size = 32
+anchor_left = 0.726
+anchor_top = 0.244
+anchor_right = 0.81
+anchor_bottom = 0.622
+offset_left = 28.07
+offset_top = -0.00800145
+offset_right = -24.5501
+offset_bottom = -0.00400317
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
 text = "End Turn"
 
-[node name="TurnCounterTexture" type="TextureRect" parent="."]
-anchors_preset = -1
-anchor_left = 0.378
-anchor_right = 0.622
-anchor_bottom = 0.343
-offset_left = 0.543976
-offset_right = 0.455956
-offset_bottom = -0.264016
-grow_horizontal = 2
-texture = ExtResource("1_g3ay4")
-expand_mode = 2
-metadata/_edit_use_anchors_ = true
-
-[node name="TurnCountdown" type="Label" parent="TurnCounterTexture"]
+[node name="TurnCountdown" type="Label" parent="Board/MenuBarTexture"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.097
-anchor_top = 0.296
-anchor_right = 0.856
-anchor_bottom = 0.714
-offset_left = 20.607
-offset_top = 6.448
-offset_right = -21.664
-offset_bottom = -5.81801
+anchor_left = 0.492
+anchor_top = 0.11
+anchor_right = 0.507
+anchor_bottom = 0.659
+offset_left = 11.94
+offset_top = -1.02
+offset_right = -10.385
+offset_bottom = -1.038
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 32
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 vertical_alignment = 1
-metadata/_edit_use_anchors_ = true
 
-[node name="Tallies" type="Label" parent="."]
+[node name="Tallies" type="Label" parent="Board"]
+layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -11.5
-offset_right = 40.0
-offset_bottom = 11.5
+offset_left = 2.0
+offset_top = 1.0
+offset_right = 42.0
+offset_bottom = 46.0
 grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
 
-[node name="TurnTimer" type="Timer" parent="."]
+[node name="TurnTimer" type="Timer" parent="Board"]
 
-[node name="TurnTicker" type="Label" parent="."]
-anchors_preset = 2
-anchor_top = 1.0
+[node name="TurnTicker" type="Label" parent="Board"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.162
+anchor_top = 0.946
+anchor_right = 0.197
 anchor_bottom = 1.0
-offset_top = -23.0
-offset_right = 40.0
+offset_left = 0.0239995
+offset_top = -0.254028
+offset_right = -0.156014
+offset_bottom = 7.0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
 
-[connection signal="pressed" from="ButtonTexture/Button" to="." method="_on_button_pressed"]
-[connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]
+[connection signal="pressed" from="Board/MenuBarTexture/Button" to="." method="_on_button_pressed"]
+[connection signal="timeout" from="Board/TurnTimer" to="." method="_on_turn_timer_timeout"]

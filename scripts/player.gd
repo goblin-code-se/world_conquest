@@ -1,7 +1,11 @@
-class Player:
-	func _init(player_name: String, player_colour: Colour, player_territory_sprite: String):
-		var name = player_name
-		var colour = player_colour
-		var territory_sprite = player_territory_sprite
+"""
+Objects used for storing state of each player
+"""
+class_name Player
 
-enum Colour {BLACK, BLUE, YELLOW, ORANGE, PURPLE}
+var _id: int
+var _troops: int
+
+func _init(id: int, troops:int):
+	_id = id
+	_troops = troops

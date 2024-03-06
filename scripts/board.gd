@@ -1,6 +1,6 @@
 extends Node
 
-const Territory = preload("res://territory.tscn")
+const Territory = preload("res://scenes/territory.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

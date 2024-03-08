@@ -4,6 +4,7 @@ var continent: String
 var who_owns: int
 var troop_number: int
 var hover: bool
+var selected: bool = false
 var graph_id: int
 
 # Called when the node enters the scene tree for the first time.
@@ -26,10 +27,10 @@ func _process(delta):
 
 # Call everytime variables to do with territory information changes:
 func update_info() -> void:
+	$TroopCount.text = str(troop_number)
 	$HoverInfo.text = "continent: {0}
 	who_owns: {1}
-	troop_number: {2}
-	graph_id: {3}".format([continent, who_owns, str(troop_number), str(graph_id)])
+	graph_id: {2}".format([continent, who_owns, str(graph_id)])
 
 func set_ownership(player: int) -> void:
 	self.who_owns = player
@@ -37,6 +38,10 @@ func set_ownership(player: int) -> void:
 	
 func set_continent(continent: String) -> void:
 	self.continent = continent
+	update_info()
+
+func increment_troops(count: int) -> void:
+	self.troop_number += count
 	update_info()
 
 func update_sprite() -> void:
@@ -61,10 +66,13 @@ func set_id(id: int) -> void:
 
 func _on_mouse_entered():
 	$HoverInfo.show()
+	$SelectBox.show()
 	hover = true
 
 
 func _on_mouse_exited():
+	if !selected:
+		$SelectBox.hide()
 	$HoverInfo.hide()
 	hover = false
 	

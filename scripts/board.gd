@@ -26,9 +26,9 @@ func _ready():
 	[2,19],[8,9],[0,29],[10,13],[25,13],[14,24],[14,37],[36,38],[22,26],[22,34],[22,37],[24,37],[15,37] # Intercontinental Edges
 	]
 	graph.add_edges(edges)
-	draw_connections(graph)
+	# draw_connections(graph)
 	
-	# graph.get_node(0).set_ownership(1)
+	# graph.get_node(0).increment_troops(1)
 	
 func _process(delta):
 	pass

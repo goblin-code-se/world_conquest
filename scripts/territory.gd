@@ -1,12 +1,10 @@
 extends Node2D
 
-enum Player {P0, P1, P2, P3, P4, P5}
-
-var continent 
-var who_owns = Player.P0
-var troop_number
-var hover
-var graph_id
+var continent: String
+var who_owns: int
+var troop_number: int
+var hover: bool
+var graph_id: int
 
 # Called when the node enters the scene tree for the first time.
 
@@ -15,6 +13,7 @@ func _ready():
 	self.troop_number = 0
 	$TerritoryName.text = self.get_name()
 	update_info()
+	update_sprite()
 	
 
 
@@ -26,13 +25,13 @@ func _process(delta):
 		$HoverInfo.global_position = get_global_mouse_position() + Vector2(10,10)
 
 # Call everytime variables to do with territory information changes:
-func update_info():
+func update_info() -> void:
 	$HoverInfo.text = "continent: {0}
 	who_owns: {1}
 	troop_number: {2}
 	graph_id: {3}".format([continent, who_owns, str(troop_number), str(graph_id)])
 
-func set_ownership(player):
+func set_ownership(player: int) -> void:
 	self.who_owns = player
 	update_sprite()
 	
@@ -43,20 +42,20 @@ func set_continent(continent: String) -> void:
 func update_sprite() -> void:
 	# no default case on match as who_owns should never not be in Player enum
 	match who_owns:
-		Player.P0:
-			$Sprite2d.texture = preload("res://assets/faction 0.png")
-		Player.P1:
-			$Sprite2D.texture = preload("res://assets/faction 1.png")
-		Player.P2:
-			$Sprite2D.texture = preload("res://assets/faction 2.png")
-		Player.P3:
-			$Sprite2D.texture = preload("res://assets/faction 3.png")
-		Player.P4:
-			$Sprite2D.texture = preload("res://assets/faction 4.png")
-		Player.P5:
-			$Sprite2D.texture = preload("res://assets/faction 5.png")
+		1:
+			$Sprite2D.texture = preload("res://assets/factions/blue faction.png")
+		2:
+			$Sprite2D.texture = preload("res://assets/factions/dark faction.png")
+		3:
+			$Sprite2D.texture = preload("res://assets/factions/orange faction.png")
+		4:
+			$Sprite2D.texture = preload("res://assets/factions/purple faction.png")
+		5:
+			$Sprite2D.texture = preload("res://assets/factions/yellow faction.png")
+		_:
+			pass
 
-func set_id(id: int):
+func set_id(id: int) -> void:
 	graph_id = id
 	update_info()
 

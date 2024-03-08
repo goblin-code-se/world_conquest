@@ -7,15 +7,16 @@ func _ready():
 	
 	var graph: Graph
 	var continents = get_continent_dict()
+	
 	# collect territories into Dictionary
 	# key: continent
 	# value: list of territories belonging to continent
 	var territories: Array = []
 	for continent: Array in continents.values():
 		territories.append_array(continent)
-	
 	graph = Graph.new(territories)
 	
+	# Disgustingly long list of edges, maybe port to text file?
 	var edges = [[0,1],[0,3],[1,3],[1,2],[1,3],[1,4],[2,4],[2,5],[3,6],[3,4],[4,5],[4,7],[5,7],[6,7],[6,8],[7,8], # North America Edges
 	[9,10],[9,11],[10,11],[10,12],[11,12], # South America Edges
 	[13,14],[13,15],[13,16],[14,15],[15,16],[15,17],[15,18],[16,17],[17,18], # Africa Edges
@@ -26,7 +27,9 @@ func _ready():
 	]
 	graph.add_edges(edges)
 	draw_connections(graph)
-
+	
+	# graph.get_node(0).set_ownership(1)
+	
 func _process(delta):
 	pass
 

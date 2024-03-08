@@ -1,10 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://wjitd0lowq3q"]
+[gd_scene load_steps=4 format=3 uid="uid://wjitd0lowq3q"]
 
 [ext_resource type="PackedScene" uid="uid://c67mjk5exq6xf" path="res://scenes/territory.tscn" id="1_3td28"]
 [ext_resource type="Script" path="res://scripts/board.gd" id="1_hagrx"]
+[ext_resource type="Texture2D" uid="uid://4xfqh5ab1nqp" path="res://assets/board.png" id="3_g325d"]
 
 [node name="Board_Main" type="Node"]
 script = ExtResource("1_hagrx")
 
 [node name="Territory" parent="." instance=ExtResource("1_3td28")]
 position = Vector2(937, 54)
+
+[node name="Board" type="TextureRect" parent="."]
+offset_left = 1.0
+offset_top = -77.0
+offset_right = 1921.0
+offset_bottom = 1003.0
+texture = ExtResource("3_g325d")
+expand_mode = 1

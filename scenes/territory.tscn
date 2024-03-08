@@ -29,6 +29,7 @@ theme_override_font_sizes/font_size = 1000
 theme_override_styles/normal = SubResource("StyleBoxFlat_bcovh")
 
 [node name="HoverInfo" type="Label" parent="."]
+visible = false
 offset_left = 2000.0
 offset_top = 1200.0
 offset_right = 6254.0

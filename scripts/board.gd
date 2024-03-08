@@ -19,8 +19,10 @@ func _ready():
 	var edges = [[0,1],[0,3],[1,3],[1,2],[1,3],[1,4],[2,4],[2,5],[3,6],[3,4],[4,5],[4,7],[5,7],[6,7],[6,8],[7,8], # North America Edges
 	[9,10],[9,11],[10,11],[10,12],[11,12], # South America Edges
 	[13,14],[13,15],[13,16],[14,15],[15,16],[15,17],[15,18],[16,17],[17,18], # Africa Edges
-	[19,21],[19,20],[20,21],[20,23],[20,25],[21,23],[21,22],[22,23],[22,24],[23,24],[23,25],[24,25] # Europe Edges
-	# Asia Edges
+	[19,21],[19,20],[20,21],[20,23],[20,25],[21,23],[21,22],[22,23],[22,24],[23,24],[23,25],[24,25], # Europe Edges
+	[26,27],[26,32],[26,34],[27,28],[27,30],[27,31],[27,32],[28,29],[28,30],[29,30],[29,33],[29,31],[30,31],[31,33],[31,32],[32,35],[32,36],[34,32],[34,37],[34,35],[35,36],[37,35],  # Asia Edges
+	[38,39],[38,40],[39,41],[41,40], # Australia Edges
+	[2,19],[8,9],[0,29],[10,13],[25,13],[14,24],[14,37],[36,38],[22,26],[22,34],[22,37],[24,37] # Intercontinental Edges
 	]
 	graph.add_edges(edges)
 	draw_connections(graph)
@@ -65,5 +67,9 @@ v1 more elegant and does exactly what is required
 "
 func draw_connections(graph: Graph) -> void:
 	for edge in graph.get_edges():
+		if edge == [0,29]: #wrap around edge as to not kill our eyes
+			draw_line(graph.get_node(0).position,Vector2(0,125))
+			draw_line(graph.get_node(29).position, Vector2(2000,137))
+			continue
 		draw_line(graph.get_node(edge[0]).position, graph.get_node(edge[1]).position)
 

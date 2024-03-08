@@ -110,4 +110,52 @@ position = Vector2(739, 431)
 
 [node name="Asia" type="Node" parent="Continents"]
 
+[node name="Ural" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1221, 197)
+
+[node name="Siberia" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1320, 153)
+
+[node name="Yakutsk" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1447, 102)
+
+[node name="Kamchatka" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1592, 125)
+
+[node name="Irkutsk" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1441, 217)
+
+[node name="Mongolia" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1454, 304)
+
+[node name="China" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1393, 406)
+
+[node name="Japan" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1654, 315)
+
+[node name="Afghanistan" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1206, 340)
+
+[node name="India" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1295, 474)
+
+[node name="Southeast Asia" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1446, 510)
+
+[node name="Middle East" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1079, 480)
+
 [node name="Australia" type="Node" parent="Continents"]
+
+[node name="Indonesia" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1484, 694)
+
+[node name="New Guinea" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1657, 641)
+
+[node name="Western Australia" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1582, 828)
+
+[node name="Eastern Australia" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1738, 794)

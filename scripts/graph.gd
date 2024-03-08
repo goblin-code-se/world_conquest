@@ -27,6 +27,10 @@ func add_edge(v: int, w: int) -> void:
 	_graph[v].append(w)
 	_graph[w].append(v)
 
+func add_edges(edges: Array) -> void:
+	for edge in edges:
+		add_edge(edge[0],edge[1])
+
 func connected(v: int,w: int) -> bool:
 	return(v in _graph[w])
 

@@ -3,7 +3,7 @@ extends Node2D
 enum Player {P0, P1, P2, P3, P4, P5}
 
 var continent 
-var who_owns = Player.P1 # allows for changing through inspector
+var who_owns = Player.P0
 var troop_number
 var hover
 var graph_id
@@ -13,8 +13,9 @@ var graph_id
 func _ready():
 	self.continent = "test continent"
 	self.troop_number = 0
+	$TerritoryName.text = self.get_name()
 	update_info()
-	update_sprite()
+	
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -34,8 +35,12 @@ func update_info():
 func set_ownership(player):
 	self.who_owns = player
 	update_sprite()
+	
+func set_continent(continent: String) -> void:
+	self.continent = continent
+	update_info()
 
-func update_sprite():
+func update_sprite() -> void:
 	# no default case on match as who_owns should never not be in Player enum
 	match who_owns:
 		Player.P0:

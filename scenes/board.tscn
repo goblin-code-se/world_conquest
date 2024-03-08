@@ -17,3 +17,46 @@ offset_right = 1921.0
 offset_bottom = 1003.0
 texture = ExtResource("3_g325d")
 expand_mode = 1
+
+[node name="Connections" type="Node" parent="."]
+
+[node name="Continents" type="Node" parent="."]
+
+[node name="North America" type="Node" parent="Continents"]
+
+[node name="Alaska" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(95, 137)
+
+[node name="Northwest Territory" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(257, 134)
+
+[node name="Greenland" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(608, 92)
+
+[node name="Alberta" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(240, 200)
+
+[node name="Ontario" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(368, 222)
+
+[node name="Eastern Canada" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(482, 240)
+
+[node name="Western United States" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(248, 311)
+
+[node name="Eastern United States" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(388, 327)
+
+[node name="Central America" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(245, 417)
+
+[node name="South America" type="Node" parent="Continents"]
+
+[node name="Africa" type="Node" parent="Continents"]
+
+[node name="Europe" type="Node" parent="Continents"]
+
+[node name="Asia" type="Node" parent="Continents"]
+
+[node name="Australia" type="Node" parent="Continents"]

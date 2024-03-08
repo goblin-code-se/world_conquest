@@ -53,9 +53,60 @@ position = Vector2(245, 417)
 
 [node name="South America" type="Node" parent="Continents"]
 
+[node name="Venezuela" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(376, 523)
+
+[node name="Brazil" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(514, 610)
+
+[node name="Peru" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(396, 645)
+
+[node name="Argentina" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(426, 744)
+
 [node name="Africa" type="Node" parent="Continents"]
 
+[node name="North Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(819, 577)
+
+[node name="Egypt" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(942, 533)
+
+[node name="East Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(1023, 614)
+
+[node name="Central Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(953, 683)
+
+[node name="South Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(976, 818)
+
+[node name="Madagascar" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(1128, 829)
+
 [node name="Europe" type="Node" parent="Continents"]
+
+[node name="Iceland" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(746, 185)
+
+[node name="Great Britain" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(725, 281)
+
+[node name="Scandinavia" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(869, 194)
+
+[node name="Russia" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(1030, 242)
+
+[node name="Northern Europe" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(874, 315)
+
+[node name="Southern Europe" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(917, 391)
+
+[node name="Western Europe" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(739, 431)
 
 [node name="Asia" type="Node" parent="Continents"]
 

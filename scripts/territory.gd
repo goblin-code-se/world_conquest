@@ -50,7 +50,7 @@ func update_sprite() -> void:
 		1:
 			$Sprite2D.texture = preload("res://assets/factions/blue faction.png")
 		2:
-			$Sprite2D.texture = preload("res://assets/factions/dark faction.png")
+			$Sprite2D.texture = preload("res://assets/factions/black faction.png")
 		3:
 			$Sprite2D.texture = preload("res://assets/factions/orange faction.png")
 		4:

@@ -7,6 +7,7 @@ func _ready():
 	
 	var graph: Graph
 	var continents = get_continent_dict()
+	var selected: Area2D
 	
 	# collect territories into Dictionary
 	# key: continent

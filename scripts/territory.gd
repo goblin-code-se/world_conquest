@@ -7,11 +7,13 @@ var hover: bool
 var selected: bool = false
 var graph_id: int
 
+signal territory_clicked
 # Called when the node enters the scene tree for the first time.
 
 func _ready():
 	self.continent = "test continent"
 	self.troop_number = 0
+	self.who_owns = 1
 	$TerritoryName.text = self.get_name()
 	update_info()
 	update_sprite()
@@ -76,3 +78,10 @@ func _on_mouse_exited():
 	$HoverInfo.hide()
 	hover = false
 	
+
+func _on_input_event(viewport, event, shape_idx):
+	var left_click: bool = (event is InputEventMouseButton and 
+		(event.pressed == true and event.button_index == 1))
+	if left_click and hover == true:
+		print( self.get_name()+" has been clicked!")
+		territory_clicked.emit()

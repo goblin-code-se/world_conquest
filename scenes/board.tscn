@@ -7,9 +7,6 @@
 [node name="Board_Main" type="Node"]
 script = ExtResource("1_hagrx")
 
-[node name="Territory" parent="." instance=ExtResource("1_3td28")]
-position = Vector2(937, 54)
-
 [node name="Board" type="TextureRect" parent="."]
 offset_left = 1.0
 offset_top = -77.0

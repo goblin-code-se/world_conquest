@@ -6,7 +6,7 @@ const Territory = preload("res://scenes/territory.tscn")
 func _ready():
 	
 	var graph: Graph
-	var continents = get_continent_dict()
+	var continents = connect_and_get_continent_dict()
 	var selected: Area2D
 	
 	# collect territories into Dictionary
@@ -27,14 +27,18 @@ func _ready():
 	[2,19],[8,9],[0,29],[10,13],[25,13],[14,24],[14,37],[36,38],[22,26],[22,34],[22,37],[24,37],[15,37] # Intercontinental Edges
 	]
 	graph.add_edges(edges)
-	# draw_connections(graph)
-	
-	# graph.get_node(0).increment_troops(1)
 	
 func _process(delta):
 	pass
 
-func get_continent_dict() -> Dictionary:
+"
+Loops over every territory doing 3 main things:
+	- adds key value pair of string continent name to list of territory nodes
+		- No type hinting for dicts in GDScript, if it were possible: Dictionary[String, Array[Territory]]
+	- sets value of each territory node's continent to respective string
+	- connects every territories left click signal to _on_territory_clicked()
+"
+func connect_and_get_continent_dict() -> Dictionary:
 	var continents : Dictionary
 	var continent_name: String
 	for continent: Node in $Continents.get_children():
@@ -44,12 +48,13 @@ func get_continent_dict() -> Dictionary:
 		for territory: Area2D in continent.get_children():
 			continents[continent_name].append(territory)
 			territory.set_continent(continent_name)
+			territory.territory_clicked.connect(_on_territory_clicked)
 	return continents
 
 "
-creates territory scene, adds to node tree, and sets position to arg
+creates territory scene, adds to node tree, and sets position to Vector2 argument
 "
-func instantiate_territory(pos: Vector2) -> Area2D:
+func instantiate_territory(pos: Vector2) -> Territory:
 	var instance = Territory.instantiate()
 	add_child(instance)
 	# instance.set_id(id)
@@ -67,7 +72,7 @@ func draw_line(from: Vector2, to: Vector2) -> Line2D:
 	return line
 
 "
-v1 more elegant and does exactly what is required
+loops through edge list of graph, drawing Line2D's under Connections Node from graph node to graph node
 "
 func draw_connections(graph: Graph) -> void:
 	for edge in graph.get_edges():
@@ -77,3 +82,6 @@ func draw_connections(graph: Graph) -> void:
 			continue
 		draw_line(graph.get_node(edge[0]).position, graph.get_node(edge[1]).position)
 
+func _on_territory_clicked(which: Territory):
+	print(str(which.get_id()))
+	

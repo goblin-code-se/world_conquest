@@ -1,7 +1,20 @@
-[gd_scene load_steps=9 format=3 uid="uid://31ga2n4vc2lr"]
+[gd_scene load_steps=12 format=3 uid="uid://31ga2n4vc2lr"]
 
 [ext_resource type="Script" path="res://scripts/dice_scene.gd" id="1_uybp4"]
 [ext_resource type="PackedScene" uid="uid://dwst3e7xkiwi2" path="res://dice.tscn" id="2_ic7og"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_633hu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jdwij"]
+diffuse_mode = 3
+specular_mode = 2
+disable_ambient_light = true
+disable_fog = true
+albedo_color = Color(0.668481, 0.0631458, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iauta"]
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bq2yh"]
 size = Vector3(1, 0.1, 1)
@@ -25,11 +38,23 @@ size = Vector3(1, 0.3, 0.1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.083, 0, 0)
 script = ExtResource("1_uybp4")
 
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 4.37114e-08, 0.445979, -1.96292e-08, 0.895043, 0.895043, 5.8618e-08, -0.445979, 1.49012e-08, 1.79052, 0.740941)
+shadow_enabled = true
+
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.7)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 1.56639, 0)
+projection = 1
+size = 1.12173
+far = 2.0
 
 [node name="Dice" parent="." instance=ExtResource("2_ic7og")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.178894, -0.620333)
+physics_material_override = SubResource("PhysicsMaterial_633hu")
+
+[node name="Cube" parent="Dice/CollisionShape3D" index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_jdwij")
+surface_material_override/1 = SubResource("StandardMaterial3D_iauta")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 transform = Transform3D(1.415, 0, 0, 0, 1.415, 0, 0, 0, 1.415, 0, 0, 0)
@@ -67,7 +92,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.45)
 shape = SubResource("BoxShape3D_j7fq0")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.0950156)
 mesh = SubResource("BoxMesh_058b7")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.836478, 0.414572, -0.358379, 0, 0.653975, 0.756516, 0.548001, -0.632809, 0.547036, 0, 0.657835, 0)
+[editable path="Dice"]

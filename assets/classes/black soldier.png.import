@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cncodiyf5sx0m"
-path="res://.godot/imported/dark soldier.png-73ca582e73e4c5ad697166cf2ad6f11e.ctex"
+path="res://.godot/imported/black soldier.png-e4f8c89b474a1002ee086583c4222d2e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/classes/dark soldier.png"
-dest_files=["res://.godot/imported/dark soldier.png-73ca582e73e4c5ad697166cf2ad6f11e.ctex"]
+source_file="res://assets/classes/black soldier.png"
+dest_files=["res://.godot/imported/black soldier.png-e4f8c89b474a1002ee086583c4222d2e.ctex"]
 
 [params]
 

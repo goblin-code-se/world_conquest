@@ -13,7 +13,7 @@ func _init(nodes: Array):
 		_graph[i] = []
 		nodes[i].set_id(i)
 
-func get_node(index: int) -> Area2D:
+func get_node(index: int) -> Territory:
 	return _nodes[index]
 
 func get_graph() -> Dictionary:
@@ -27,11 +27,15 @@ func add_edge(v: int, w: int) -> void:
 	_graph[v].append(w)
 	_graph[w].append(v)
 
+func add_edges(edges: Array) -> void:
+	for edge in edges:
+		add_edge(edge[0],edge[1])
+
 func connected(v: int,w: int) -> bool:
 	return(v in _graph[w])
 
 
-func dfs(start_node: int) -> Array:
+func dfs(start_node: int) -> Array[Array]:
 	var edges = [start_node]
 	var checked = 0
 	while checked < edges.size():

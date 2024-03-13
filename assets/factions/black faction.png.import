@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://4dckso23v1mf"
-path="res://.godot/imported/dark faction.png-976d21a86dc1d13a1e6e759ab5a88fc3.ctex"
+path="res://.godot/imported/black faction.png-f17e91ad63d6e214565158ef2baee73f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/factions/dark faction.png"
-dest_files=["res://.godot/imported/dark faction.png-976d21a86dc1d13a1e6e759ab5a88fc3.ctex"]
+source_file="res://assets/factions/black faction.png"
+dest_files=["res://.godot/imported/black faction.png-f17e91ad63d6e214565158ef2baee73f.ctex"]
 
 [params]
 

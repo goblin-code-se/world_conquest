@@ -1,66 +1,89 @@
 extends Node2D
+class_name Territory
 
-enum Player {P0, P1, P2, P3, P4, P5}
+var _continent: String
+var _who_owns: int
+var _troop_number: int
+var _hover: bool
+var _selected: bool = false
+var _graph_id: int
 
-var continent 
-var who_owns = Player.P1 # allows for changing through inspector
-var troop_number
-var hover
-var graph_id
-
+signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
 
 func _ready():
-	self.continent = "test continent"
-	self.troop_number = 0
+	_continent = "test continent"
+	_troop_number = 0
+	_who_owns = 0
+	$TerritoryName.text = self.get_name()
 	update_info()
 	update_sprite()
+	
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	# called for every frame mouse is hovering over territory
-	if hover:
+	if _hover:
 		# without offest Vec, text covered by mouse
 		$HoverInfo.global_position = get_global_mouse_position() + Vector2(10,10)
 
 # Call everytime variables to do with territory information changes:
-func update_info():
+func update_info() -> void:
+	$TroopCount.text = str(_troop_number)
 	$HoverInfo.text = "continent: {0}
 	who_owns: {1}
-	troop_number: {2}
-	graph_id: {3}".format([continent, who_owns, str(troop_number), str(graph_id)])
+	graph_id: {2}".format([_continent, _who_owns, str(_graph_id)])
 
-func set_ownership(player):
-	self.who_owns = player
+func set_ownership(player: int) -> void:
+	_who_owns = player
 	update_sprite()
+	
+func set_continent(continent: String) -> void:
+	_continent = continent
+	update_info()
 
-func update_sprite():
+func increment_troops(count: int) -> void:
+	_troop_number += count
+	update_info()
+
+func update_sprite() -> void:
 	# no default case on match as who_owns should never not be in Player enum
-	match who_owns:
-		Player.P0:
-			$Sprite2d.texture = preload("res://assets/faction 0.png")
-		Player.P1:
-			$Sprite2D.texture = preload("res://assets/faction 1.png")
-		Player.P2:
-			$Sprite2D.texture = preload("res://assets/faction 2.png")
-		Player.P3:
-			$Sprite2D.texture = preload("res://assets/faction 3.png")
-		Player.P4:
-			$Sprite2D.texture = preload("res://assets/faction 4.png")
-		Player.P5:
-			$Sprite2D.texture = preload("res://assets/faction 5.png")
+	match _who_owns:
+		1:
+			$Sprite2D.texture = preload("res://assets/factions/blue faction.png")
+		2:
+			$Sprite2D.texture = preload("res://assets/factions/black faction.png")
+		3:
+			$Sprite2D.texture = preload("res://assets/factions/orange faction.png")
+		4:
+			$Sprite2D.texture = preload("res://assets/factions/purple faction.png")
+		5:
+			$Sprite2D.texture = preload("res://assets/factions/yellow faction.png")
+		_:
+			pass
 
-func set_id(id: int):
-	graph_id = id
+func get_id() -> int:
+	return _graph_id
+
+func set_id(id: int) -> void:
+	_graph_id = id
 	update_info()
 
 func _on_mouse_entered():
 	$HoverInfo.show()
-	hover = true
+	$SelectBox.show()
+	_hover = true
 
 
 func _on_mouse_exited():
+	if !_selected:
+		$SelectBox.hide()
 	$HoverInfo.hide()
-	hover = false
+	_hover = false
 	
+
+func _on_input_event(viewport, event, shape_idx):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _hover:
+			territory_clicked.emit(self)

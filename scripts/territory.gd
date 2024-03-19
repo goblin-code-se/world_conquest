@@ -17,7 +17,7 @@ func _ready():
 	_who_owns = 0
 	$TerritoryName.text = self.get_name()
 	update_info()
-	update_sprite()
+	#update_sprite()
 	
 
 
@@ -34,6 +34,9 @@ func update_info() -> void:
 	$HoverInfo.text = "continent: {0}
 	who_owns: {1}
 	graph_id: {2}".format([_continent, _who_owns, str(_graph_id)])
+
+func get_ownership() -> int:
+	return _who_owns
 
 func set_ownership(player: int) -> void:
 	_who_owns = player

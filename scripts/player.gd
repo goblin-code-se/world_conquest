@@ -9,3 +9,4 @@ var _troops: int
 func _init(id: int, troops:int):
 	_id = id
 	_troops = troops
+

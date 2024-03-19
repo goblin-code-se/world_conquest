@@ -28,6 +28,7 @@ func _ready():
 	]
 	graph.add_edges(edges)
 	draw_connections(graph)
+	populate(edges)
 	
 func _process(delta):
 	pass
@@ -83,6 +84,73 @@ func draw_connections(graph: Graph) -> void:
 			continue
 		draw_line(graph.get_node(edge[0]).position, graph.get_node(edge[1]).position)
 
+
+"""Rick!"""
+# enum for the game states.
+# This should later be expanded to cover all possible game states, like reinforcing etc
+enum GameState {
+	select_attacker,
+	select_attacked,
+	adding_troops,
+	attack
+}
+
+var current_game_state = GameState.select_attacker # This shouldn't be left like that
+# Recommendation: In _ready() specify the game state at every state. There should be a general "do nothing" state and be changed for attack when, welp, attacking
+# Also, these attacking/defender could be added to the attack() function, and just call it when, WELP, attacking, so it re-starts
+var attacking_territory: Territory = null
+var defender_territory: Territory = null
+
 func _on_territory_clicked(which: Territory):
-	print(str(which.get_id()))
+	#print(str(which.get_id()))
+	match current_game_state:
+		GameState.select_attacker:
+			if which.get_ownership() == 0: # This 0 has to be changed to player id
+				attacking_territory = which
+				print("Attacker territory: ", which.get_id())
+				current_game_state = GameState.select_attacked
+			else:
+				print("not your territory bro")
+		GameState.select_attacked:
+			if which.get_id() in adjacent_territories[attacking_territory.get_id()]: #and which.get_ownership() != attacking_territory.get_ownership():
+				defender_territory = which
+				current_game_state = GameState.select_attacked
+				print("defender: ", which.get_id())
+			else:
+				print("can't attackkkkk")
+			
+	
+var adjacent_territories = {} #Yeah this var should also be added to attack() probs.
+#Also, probably a more descriptive name would be populate_adjacent_list or something like that
+func populate(edges):
+	for edge in edges:
+		if edge[0] not in adjacent_territories:
+			adjacent_territories[edge[0]] = []
+		if edge[1] not in adjacent_territories:
+			adjacent_territories[edge[1]] = []
+		adjacent_territories[edge[0]].append(edge[1])
+		adjacent_territories[edge[1]].append(edge[0])
+
+
+func attack(attacking_territory, defender_territory):
+	var attacker_losses = 0
+	var defender_losses = 0
+	
+	var attack_dice = []
+	for i in range(3):
+		attack_dice.append(randi() % 6 +1)
+	attack_dice.sort()
+	attack_dice.reverse()
+	
+	var defense_dice = []
+	for i in range(2):
+		defense_dice.append(randi() % 6 +1)
+	defense_dice.sort()
+	defense_dice.reverse()
+	
+	for i in range(min(attack_dice.size(), defense_dice.size())):
+		if attack_dice[i] > defense_dice[i]:
+			defender_losses +=1
+		else:
+			attacker_losses +=1
 	

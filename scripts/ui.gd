@@ -4,18 +4,21 @@ const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to p
 @export var player_count = 5
 @export var troop_count = 25
 var current_player: Player
-var players = Queue.new()
+var players: TurnTracker
 
 @onready var tallies = $Tallies
 @onready var turn_timer = $TurnTimer
 @onready var turn_countdown = $MenuBar/Container/TurnCountdown
 @onready var turn_ticker = $MenuBar/Container/TurnTicker
 
+	
 # Queues players for turn rota, displays player troop counts, starts timer and sets current player as first in queue
 func _ready():
+	var arr: Array[Player]
 	for i in range(1, player_count+1):
-		players.enqueue(Player.new(i, troop_count))
+		arr.append(Player.new(i, troop_count))
 		tallies.text += "P{num}: {troops}\n".format({"num":i, "troops":troop_count})
+	players = TurnTracker.new(arr)
 	turn_timer.start(turn_time) 
 	current_player = players.peek()
 
@@ -33,12 +36,9 @@ func _process(_delta):
 
 # Checks troop count of next player, and switches to their turn if they can still play
 func next_player():
+	current_player = players.next() # Current player is now the next player
 	if current_player._troops <= 0:
-		players.dequeue() # Remove player from game permanently if no troops left
-		current_player = players.peek()
-	var next = players.dequeue()
-	players.enqueue(next) # Re-add to back of queue
-	current_player = players.peek() # Current player is now the next player
+		next_player() # Ignore players with no troops left
 
 func end_turn():
 	if turn_timer.get_time_left() != 0:
@@ -46,7 +46,11 @@ func end_turn():
 	next_player()
 	turn_timer.start(turn_time)
 	tallies.text = ""
-	for player in players._players:
+	var active_players: Array[Player]
+	for i in players._players:
+		if i._troops > 0:
+			active_players.append(i)
+	for player in active_players:
 		tallies.text += "P{num}: {troops}\n".format({"num":player._id, "troops":troop_count})
 
 func _on_button_pressed():

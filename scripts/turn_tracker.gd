@@ -1,6 +1,5 @@
 """
 Queue used for ordering of turns implemented with array
-Array contains Player objects
 """
 class_name TurnTracker
 

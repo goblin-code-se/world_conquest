@@ -8,7 +8,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kcnpr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d0qa0"]
-radius = 1702.94
+radius = 3401.47
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dljpx"]
 
@@ -24,6 +24,7 @@ color = Color(0, 0, 0, 1)
 polygon = PackedVector2Array(0, -2700, -1900, -1900, -2600, -100, -1900, 1800, 0, 2500, 1800, 1800, 2600, -100, 1800, -1900)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(2, 2)
 texture = ExtResource("2_cyiv8")
 
 [node name="TerritoryName" type="Label" parent="."]

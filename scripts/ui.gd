@@ -5,11 +5,14 @@ const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to p
 @export var troop_count = 25
 var current_player: Player
 var players = Queue.new()
+var gameState: String
 
 @onready var tallies = $Tallies
 @onready var turn_timer = $TurnTimer
 @onready var turn_countdown = $MenuBar/Container/TurnCountdown
 @onready var turn_ticker = $MenuBar/Container/TurnTicker
+
+signal change_state()
 
 # Queues players for turn rota, displays player troop counts, starts timer and sets current player as first in queue
 func _ready():
@@ -49,8 +52,14 @@ func end_turn():
 	for player in players._players:
 		tallies.text += "P{num}: {troops}\n".format({"num":player._id, "troops":troop_count})
 
+func update_game_state(state: String) -> void:
+	$MenuBar/Container/GameState.text = state
+
 func _on_button_pressed():
 	end_turn()
 
 func _on_turn_timer_timeout():
 	end_turn()
+
+func _on_state_changer_pressed():
+	change_state.emit()

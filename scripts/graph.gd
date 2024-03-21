@@ -37,15 +37,21 @@ func add_edges(edges: Array) -> void:
 func connected(v: int,w: int) -> bool:
 	return(v in _graph[w])
 
-func dfs(start_node: int) -> Array[Array]:
-	var edges = [start_node]
+
+"""
+performs depth first search
+ - returns list of nodes directly connected to start_node
+"""
+func dfs(start_node: int) -> Array:
+	var nodes = [start_node]
+	var current_player = get_node(start_node).get_ownership()
 	var checked = 0
-	while checked < edges.size():
-		for edge in _graph[edges[checked]]:
-			if !(edge in edges):
-				edges.append(edge)
+	while checked < nodes.size():
+		for node in _graph[nodes[checked]]:
+			if !(node in nodes) and get_node(node).get_ownership() == current_player:
+				nodes.append(node)
 		checked += 1
-	return edges
+	return nodes
 
 func get_adjacent_nodes(node_id: int) -> Array:
 	return _graph[node_id]

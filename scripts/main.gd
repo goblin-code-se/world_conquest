@@ -38,6 +38,7 @@ func _process(delta):
 #Also, probably a more descriptive name would be populate_adjacent_list or something like that
 """
 this is already done in Graph class method get_adjacent_nodes()
+
 func populate(edges):
 	for edge in edges:
 		if edge[0] not in adjacent_territories:
@@ -48,8 +49,8 @@ func populate(edges):
 		adjacent_territories[edge[1]].append(edge[0])
 """
 
-func attack(attacking_territory, defender_territory):
-	var ATTACKer_losses = 0
+func attack(attacking_territory: Territory, defender_territory: Territory):
+	var attacker_losses = 0
 	var defender_losses = 0
 	
 	var attack_dice = []
@@ -68,7 +69,7 @@ func attack(attacking_territory, defender_territory):
 		if attack_dice[i] > defense_dice[i]:
 			defender_losses +=1
 		else:
-			ATTACKer_losses +=1
+			attacker_losses +=1
 	
 
 
@@ -127,6 +128,7 @@ func _on_board_main_territory_clicked(which: Territory):
 				
 
 """John!"""
+
 """
 checks if every node in the board belongs to one player id (game over)
  - returns -1 if no winner
@@ -138,20 +140,21 @@ func is_game_over() -> int:
 		if node.get_ownership() != winner:
 			return -1
 	return winner
-	
+
 """
-returns whether or not a move to and from a territory is valid
+returns whether or not a move to and from two territories is valid
  - returns true if both territories are connected and belong to same player
  - returns false otherwise
 """
-func valid_move(from: Territory, to: Territory) -> bool:
-	var connected_nodes = board_graph.dfs(from.get_id())
-	if to.get_ownership() == current_player and to.get_id() in connected_nodes:
+func valid_move(moving_from: Territory, moving_to: Territory) -> bool:
+	var connected_nodes = board_graph.dfs(moving_from.get_id())
+	if moving_to.get_ownership() == current_player and moving_to.get_id() in connected_nodes:
 		return true
 	return false
 
-func move(from: Territory, to: Territory, amount: int):
+"""
+moves an amount of troops from one territory to the other
+"""
+func move(from: Territory, to: Territory, amount: int) -> void:
 	from.increment_troops(-amount)
 	to.increment_troops(amount)
-	
-	

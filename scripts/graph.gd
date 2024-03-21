@@ -40,7 +40,7 @@ func connected(v: int,w: int) -> bool:
 
 """
 performs depth first search
- - returns list of nodes directly connected to start_node
+ - returns list of node IDs directly connected to start_node
 """
 func dfs(start_node: int) -> Array:
 	var nodes = [start_node]

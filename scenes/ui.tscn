@@ -52,6 +52,15 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="GameState" type="Label" parent="MenuBar/Container"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+
+[node name="StateChanger" type="Button" parent="MenuBar/Container"]
+layout_mode = 2
+text = "NEXT STATE"
+
 [node name="TurnTicker" type="Label" parent="MenuBar/Container"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
@@ -83,5 +92,6 @@ theme_override_font_sizes/font_size = 32
 
 [node name="TurnTimer" type="Timer" parent="."]
 
+[connection signal="pressed" from="MenuBar/Container/StateChanger" to="." method="_on_state_changer_pressed"]
 [connection signal="pressed" from="MenuBar/Container/Button" to="." method="_on_button_pressed"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

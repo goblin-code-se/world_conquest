@@ -13,6 +13,9 @@ func _init(nodes: Array):
 		_graph[i] = []
 		nodes[i].set_id(i)
 
+func get_nodes() -> Array:
+	return _nodes
+
 func get_node(index: int) -> Territory:
 	return _nodes[index]
 
@@ -34,7 +37,6 @@ func add_edges(edges: Array) -> void:
 func connected(v: int,w: int) -> bool:
 	return(v in _graph[w])
 
-
 func dfs(start_node: int) -> Array[Array]:
 	var edges = [start_node]
 	var checked = 0
@@ -44,3 +46,11 @@ func dfs(start_node: int) -> Array[Array]:
 				edges.append(edge)
 		checked += 1
 	return edges
+
+"
+func get_adjacent_territories(id: int) -> Array:
+	var adjacent_nodes: Array = []
+	for i in _graph[id]:
+		adjacent_nodes.append(_nodes[i])
+	return adjacent_nodes
+"

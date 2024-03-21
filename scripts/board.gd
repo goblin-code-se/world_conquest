@@ -1,13 +1,29 @@
 extends Node
+class_name Board
 
+const IterTools = preload("res://scripts/itertools.gd")
 const Territory = preload("res://scenes/territory.tscn")
+var currentPlayer: int
+var playerQueue: Queue
+var players: Array[Player]
+var graph: Graph
+var iterTools = IterTools.new()
+var current_game_state
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$"Continents/North America/Alaska".set_ownership(1)
+	playerQueue = Queue.new()
+	var player: Player
+	for i in range(5):
+		player = Player.new(i, 0)
+		players.append(player)
+		playerQueue.enqueue(player)
+		
 	
-	var graph: Graph
 	var continents = connect_and_get_continent_dict()
 	var selected: Area2D
+	var currentPlayer: int = 0
 	
 	# collect territories into Dictionary
 	# key: continent
@@ -29,6 +45,10 @@ func _ready():
 	graph.add_edges(edges)
 	draw_connections(graph)
 	populate(edges)
+	currentPlayer = 0
+	# game_loop()
+	
+	
 	
 func _process(delta):
 	pass
@@ -92,20 +112,24 @@ enum GameState {
 	select_attacker,
 	select_attacked,
 	adding_troops,
-	attack
+	attack,
+	moving_troops
 }
 
-var current_game_state = GameState.select_attacker # This shouldn't be left like that
+# var current_game_state = GameState.select_attacker # This shouldn't be left like that
 # Recommendation: In _ready() specify the game state at every state. There should be a general "do nothing" state and be changed for attack when, welp, attacking
 # Also, these attacking/defender could be added to the attack() function, and just call it when, WELP, attacking, so it re-starts
 var attacking_territory: Territory = null
 var defender_territory: Territory = null
 
 func _on_territory_clicked(which: Territory):
-	#print(str(which.get_id()))
 	match current_game_state:
+		GameState.adding_troops:
+			print("adding troops")
+			if which.get_ownership() == currentPlayer:
+				which.increment_troops(1) # can add multiple at a time eventually to help with turns of huge amounts of troops
 		GameState.select_attacker:
-			if which.get_ownership() == 0: # This 0 has to be changed to player id
+			if which.get_ownership() == currentPlayer: # This 0 has to be changed to player id
 				attacking_territory = which
 				print("Attacker territory: ", which.get_id())
 				current_game_state = GameState.select_attacked
@@ -118,7 +142,6 @@ func _on_territory_clicked(which: Territory):
 				print("defender: ", which.get_id())
 			else:
 				print("can't attackkkkk")
-			
 	
 var adjacent_territories = {} #Yeah this var should also be added to attack() probs.
 #Also, probably a more descriptive name would be populate_adjacent_list or something like that
@@ -154,3 +177,21 @@ func attack(attacking_territory, defender_territory):
 		else:
 			attacker_losses +=1
 	
+"""John!"""
+func is_game_over() -> int:
+	var winner = graph.get_nodes()[0].get_ownership()
+	for node in graph.get_nodes():
+		if node.get_ownership() != winner:
+			return -1
+	return winner
+
+"
+func game_loop():
+	print(\"entered main game loop\")
+	while is_game_over() < 0:
+		current_game_state = GameState.adding_troops
+		while current_game_state == GameState.adding_troops:
+			current_game_state = GameState.adding_troops
+		current_game_state = GameState.attack
+		current_game_state = GameState.moving_troops
+"		

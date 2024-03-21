@@ -47,6 +47,9 @@ func dfs(start_node: int) -> Array[Array]:
 		checked += 1
 	return edges
 
+func get_adjacent_nodes(node_id: int) -> Array:
+	return _graph[node_id]
+
 "
 func get_adjacent_territories(id: int) -> Array:
 	var adjacent_nodes: Array = []

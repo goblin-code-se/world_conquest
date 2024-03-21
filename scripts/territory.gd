@@ -14,10 +14,10 @@ signal territory_clicked(which)
 func _ready():
 	_continent = "test continent"
 	_troop_number = 0
-	_who_owns = 0
+	_who_owns = 3
 	$TerritoryName.text = self.get_name()
 	update_info()
-	#update_sprite()
+	update_sprite()
 	
 
 

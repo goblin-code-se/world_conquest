@@ -57,9 +57,18 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
 
-[node name="StateChanger" type="Button" parent="MenuBar/Container"]
+[node name="TroopCount" type="Label" parent="MenuBar/Container"]
 layout_mode = 2
-text = "NEXT STATE"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Troop Count: 0"
+
+[node name="MoveButton" type="Button" parent="MenuBar/Container"]
+layout_mode = 2
+text = "MOVE"
+
+[node name="AttackButton" type="Button" parent="MenuBar/Container"]
+layout_mode = 2
+text = "ATTACK"
 
 [node name="TurnTicker" type="Label" parent="MenuBar/Container"]
 layout_mode = 2
@@ -92,6 +101,7 @@ theme_override_font_sizes/font_size = 32
 
 [node name="TurnTimer" type="Timer" parent="."]
 
-[connection signal="pressed" from="MenuBar/Container/StateChanger" to="." method="_on_state_changer_pressed"]
+[connection signal="pressed" from="MenuBar/Container/MoveButton" to="." method="_on_move_button_pressed"]
+[connection signal="pressed" from="MenuBar/Container/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="MenuBar/Container/Button" to="." method="_on_button_pressed"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

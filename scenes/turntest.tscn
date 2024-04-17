@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2hqgt8ssektr"]
+
+[ext_resource type="PackedScene" uid="uid://c67mjk5exq6xf" path="res://scenes/territory.tscn" id="2_5kaw4"]
+
+[sub_resource type="GDScript" id="GDScript_52oay"]
+script/source = "
+	
+	
+"
+
+[node name="TurnTest" type="Node2D"]
+script = SubResource("GDScript_52oay")
+
+[node name="Territories" type="Node" parent="."]
+
+[node name="Territory6" parent="Territories" instance=ExtResource("2_5kaw4")]
+
+[node name="Territory" parent="Territories" instance=ExtResource("2_5kaw4")]
+position = Vector2(481, 367)
+
+[node name="Territory2" parent="Territories" instance=ExtResource("2_5kaw4")]
+position = Vector2(115, 371)
+
+[node name="Territory3" parent="Territories" instance=ExtResource("2_5kaw4")]
+position = Vector2(257, 182)
+
+[node name="Territory5" parent="Territories" instance=ExtResource("2_5kaw4")]
+position = Vector2(452, 48)
+
+[node name="Territory4" parent="Territories" instance=ExtResource("2_5kaw4")]
+position = Vector2(659, 178)

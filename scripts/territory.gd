@@ -14,12 +14,10 @@ signal territory_clicked(which)
 func _ready():
 	_continent = "test continent"
 	_troop_number = 0
-	_who_owns = 3
+	_who_owns = 0
 	$TerritoryName.text = self.get_name()
 	update_info()
 	update_sprite()
-	
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -50,6 +48,9 @@ func increment_troops(count: int) -> void:
 	_troop_number += count
 	update_info()
 
+func get_troop_number() -> int:
+	return _troop_number
+	
 func update_sprite() -> void:
 	# no default case on match as who_owns should never not be in Player enum
 	match _who_owns:

@@ -12,14 +12,15 @@ var gameState: String
 @onready var turn_countdown = $MenuBar/Container/TurnCountdown
 @onready var turn_ticker = $MenuBar/Container/TurnTicker
 
-signal change_state()
+signal attack_button_pressed()
+signal move_button_pressed()
 
 # Queues players for turn rota, displays player troop counts, starts timer and sets current player as first in queue
 func _ready():
 	for i in range(1, player_count+1):
 		players.enqueue(Player.new(i, troop_count))
 		tallies.text += "P{num}: {troops}\n".format({"num":i, "troops":troop_count})
-	turn_timer.start(turn_time) 
+	turn_timer.start(turn_time)
 	current_player = players.peek()
 
 # div by 60 to get minutes, mod by 60 to get seconds
@@ -32,7 +33,7 @@ func _process(_delta):
 		turn_countdown.text = str(int(turn_timer.get_time_left())/60)+":0"+str(int(turn_timer.get_time_left())%60) 
 	else: 
 		turn_countdown.text = str(int(turn_timer.get_time_left())/60)+":"+str(int(turn_timer.get_time_left())%60)
-	turn_ticker.text = "Player {n}'s turn!".format({"n":current_player._id})
+	# turn_ticker.text = "Player {n}'s turn!".format({"n":current_player._id})
 
 # Checks troop count of next player, and switches to their turn if they can still play
 func next_player():
@@ -52,8 +53,14 @@ func end_turn():
 	for player in players._players:
 		tallies.text += "P{num}: {troops}\n".format({"num":player._id, "troops":troop_count})
 
+func update_turn_ticker(player: int) -> void:
+	$MenuBar/Container/TurnTicker.text = "Player {0}'s turn!".format([player])
+
 func update_game_state(state: String) -> void:
 	$MenuBar/Container/GameState.text = state
+
+func update_troop_count(troop_count: int) -> void:
+	$MenuBar/Container/TroopCount.text = "Troop count: {0}".format([troop_count])
 
 func _on_button_pressed():
 	end_turn()
@@ -61,5 +68,8 @@ func _on_button_pressed():
 func _on_turn_timer_timeout():
 	end_turn()
 
-func _on_state_changer_pressed():
-	change_state.emit()
+func _on_attack_button_pressed():
+	attack_button_pressed.emit()
+
+func _on_move_button_pressed():
+	move_button_pressed.emit()

@@ -9,6 +9,7 @@ var players: Array[Player]
 var graph: Graph
 var iterTools = IterTools.new()
 var current_game_state
+var continents
 
 signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
@@ -22,7 +23,7 @@ func _ready():
 		playerQueue.enqueue(player)
 		
 	
-	var continents = connect_and_get_continent_dict()
+	continents = connect_and_get_continent_dict()
 	var selected: Area2D
 	var currentPlayer: int = 0
 	

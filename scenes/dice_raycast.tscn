@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5h36cs0xxcx4"]
+
+[ext_resource type="Script" path="res://scripts/die_raycast.gd" id="1_wff6n"]
+
+[node name="DiceRaycast" type="RayCast3D"]
+target_position = Vector3(0, -0.1, 0)
+hit_from_inside = true
+collide_with_areas = true
+script = ExtResource("1_wff6n")

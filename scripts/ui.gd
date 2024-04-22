@@ -34,7 +34,6 @@ func _process(_delta):
 		turn_countdown.text = str(int(turn_timer.get_time_left())/60)+":0"+str(int(turn_timer.get_time_left())%60) 
 	else: 
 		turn_countdown.text = str(int(turn_timer.get_time_left())/60)+":"+str(int(turn_timer.get_time_left())%60)
-	# turn_ticker.text = "Player {n}'s turn!".format({"n":current_player._id})
 
 # Checks troop count of next player, and switches to their turn if they can still play
 func next_player():
@@ -51,6 +50,7 @@ func end_turn():
 	next_player()
 	turn_timer.start(turn_time)
 	tallies.text = ""
+	
 	for player in players._players:
 		tallies.text += "P{num}: {troops}\n".format({"num":player._id, "troops":troop_count})
 

@@ -4,7 +4,7 @@ const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to p
 @export var player_count = 5
 @export var troop_count = 25
 var current_player: Player
-var players = Queue.new()
+var players: TurnTracker
 var gameState: String
 
 @onready var tallies = $Tallies
@@ -20,6 +20,7 @@ func _ready():
 	for i in range(1, player_count+1):
 		players.enqueue(Player.new(i, troop_count))
 		tallies.text += "P{num}: {troops}\n".format({"num":i, "troops":troop_count})
+	players = TurnTracker.new(arr)
 	turn_timer.start(turn_time)
 	current_player = players.peek()
 

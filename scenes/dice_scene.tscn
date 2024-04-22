@@ -1,7 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://31ga2n4vc2lr"]
+[gd_scene load_steps=8 format=3 uid="uid://31ga2n4vc2lr"]
 
-[ext_resource type="Script" path="res://scripts/dice_scene.gd" id="1_uybp4"]
-[ext_resource type="PackedScene" uid="uid://dwst3e7xkiwi2" path="res://dice.tscn" id="2_ic7og"]
+[ext_resource type="Script" path="res://scripts/dice_scene.gd" id="1_l8wuj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bq2yh"]
 size = Vector3(1, 0.1, 1)
@@ -23,13 +22,10 @@ size = Vector3(1, 0.3, 0.1)
 
 [node name="Main" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.083, 0, 0)
-script = ExtResource("1_uybp4")
+script = ExtResource("1_l8wuj")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.7)
-
-[node name="Dice" parent="." instance=ExtResource("2_ic7og")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, -0.000855251, 1, 0, -1, -0.000855251, 0, 1.00642, 0.0173473)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 transform = Transform3D(1.415, 0, 0, 0, 1.415, 0, 0, 0, 1.415, 0, 0, 0)
@@ -71,3 +67,9 @@ mesh = SubResource("BoxMesh_058b7")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.836478, 0.414572, -0.358379, 0, 0.653975, 0.756516, 0.548001, -0.632809, 0.547036, 0, 0.657835, 0)
+
+[node name="Results" type="Label3D" parent="."]
+transform = Transform3D(0.25, -1.74393e-16, -3.81149e-24, -3.81149e-24, -1.09278e-08, 0.25, -1.74393e-16, -0.25, -1.09278e-08, 2.08165e-12, 0.7, 2.08165e-12)
+visible = false
+text = "[2,3,4]"
+font_size = 128

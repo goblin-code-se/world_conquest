@@ -1,17 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://dwst3e7xkiwi2"]
-
-[ext_resource type="Script" path="res://scripts/diceAngle.gd" id="1_7aiqy"]
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_owmve"]
-bounce = 0.6
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_b0i7f"]
-size = Vector3(0.12, 0.12, 0.12)
+[gd_resource type="ArrayMesh" load_steps=4 format=3 uid="uid://bwckvscdr8oxj"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p8wcm"]
 resource_name = "Material"
 cull_mode = 2
-albedo_color = Color(0.906727, 0, 0.132172, 1)
+albedo_color = Color(0.905882, 0, 0.133333, 1)
 roughness = 0.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y57x4"]
@@ -45,7 +37,7 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_lknrj"]
+[resource]
 resource_name = "dice_Cube"
 _surfaces = [{
 "aabb": AABB(-1, -1, -1, 2, 2, 2),
@@ -75,24 +67,3 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_oq2vo")
-
-[node name="Dice" type="RigidBody3D"]
-mass = 0.1
-physics_material_override = SubResource("PhysicsMaterial_owmve")
-gravity_scale = 0.5
-continuous_cd = true
-max_contacts_reported = 10
-contact_monitor = true
-script = ExtResource("1_7aiqy")
-rotation_power = 12.0
-rotation_minimum = 4.0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_b0i7f")
-
-[node name="Cube" type="MeshInstance3D" parent="CollisionShape3D"]
-transform = Transform3D(-2.18557e-09, 0, -0.05, 0, 0.05, 0, 0.05, 0, -2.18557e-09, 0, 0, 0)
-mesh = SubResource("ArrayMesh_lknrj")
-skeleton = NodePath("")
-
-[connection signal="sleeping_state_changed" from="." to="." method="_on_sleeping_state_changed"]

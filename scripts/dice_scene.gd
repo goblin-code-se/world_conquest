@@ -1,7 +1,7 @@
 extends Node3D
 
-var attacking_die = false;
-var count = 3;
+var attacking_die = true;
+var count = 5;
 var internal_results = [];
 signal results;
 

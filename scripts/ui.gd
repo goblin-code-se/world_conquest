@@ -12,7 +12,6 @@ var gameState: String
 @onready var turn_countdown = $MenuBar/Container/TurnCountdown
 @onready var turn_ticker = $MenuBar/Container/TurnTicker
 
-signal change_state()
 signal attack_button_pressed()
 signal move_button_pressed()
 
@@ -23,7 +22,7 @@ func _ready():
 		arr.append(Player.new(i, troop_count))
 		tallies.text += "P{num}: {troops}\n".format({"num":i, "troops":troop_count})
 	players = TurnTracker.new(arr)
-	turn_timer.start(turn_time) 
+	turn_timer.start(turn_time)
 	current_player = players.peek()
 
 # div by 60 to get minutes, mod by 60 to get seconds
@@ -36,7 +35,6 @@ func _process(_delta):
 		turn_countdown.text = str(int(turn_timer.get_time_left())/60)+":0"+str(int(turn_timer.get_time_left())%60) 
 	else: 
 		turn_countdown.text = str(int(turn_timer.get_time_left())/60)+":"+str(int(turn_timer.get_time_left())%60)
-	# turn_ticker.text = "Player {n}'s turn!".format({"n":current_player._id})
 
 # Checks troop count of next player, and switches to their turn if they can still play
 func next_player():
@@ -50,11 +48,8 @@ func end_turn():
 	next_player()
 	turn_timer.start(turn_time)
 	tallies.text = ""
-	var active_players: Array[Player]
-	for i in players._players:
-		if i._troops > 0:
-			active_players.append(i)
-	for player in active_players:
+	
+	for player in players._players:
 		tallies.text += "P{num}: {troops}\n".format({"num":player._id, "troops":troop_count})
 
 func update_turn_ticker(player: int) -> void:

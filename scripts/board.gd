@@ -1,13 +1,11 @@
 extends Node
 class_name Board
 
-const IterTools = preload("res://scripts/itertools.gd")
 const Territory = preload("res://scenes/territory.tscn")
 var currentPlayer: int
 var playerQueue: Queue
 var players: Array[Player]
 var graph: Graph
-var iterTools = IterTools.new()
 var current_game_state
 var continents
 

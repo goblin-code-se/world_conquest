@@ -21,9 +21,3 @@ func enumerate(iterator, start: int = 0, step: int = 1):
 func fold(function: Callable, iterator, acc: int = 0):
 	for element in iterator:
 		acc = function.call(acc, element)
-		
-func array_to_string(arr: Array) -> String:
-	var string = ""
-	for i in arr:
-		string += String(i)
-	return string

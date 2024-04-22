@@ -1,0 +1,158 @@
+[gd_scene load_steps=4 format=3 uid="uid://wjitd0lowq3q"]
+
+[ext_resource type="PackedScene" uid="uid://c67mjk5exq6xf" path="res://scenes/territory.tscn" id="1_3td28"]
+[ext_resource type="Script" path="res://scripts/board.gd" id="1_hagrx"]
+[ext_resource type="Texture2D" uid="uid://4xfqh5ab1nqp" path="res://assets/board.png" id="3_g325d"]
+
+[node name="Board_Main" type="Node"]
+script = ExtResource("1_hagrx")
+
+[node name="Board" type="TextureRect" parent="."]
+offset_left = 1.0
+offset_top = -77.0
+offset_right = 1921.0
+offset_bottom = 1003.0
+texture = ExtResource("3_g325d")
+expand_mode = 1
+
+[node name="Connections" type="Node" parent="."]
+
+[node name="Continents" type="Node" parent="."]
+
+[node name="North America" type="Node" parent="Continents"]
+
+[node name="Alaska" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(95, 137)
+
+[node name="Northwest Territory" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(257, 134)
+
+[node name="Greenland" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(608, 92)
+
+[node name="Alberta" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(240, 200)
+
+[node name="Ontario" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(368, 222)
+
+[node name="Eastern Canada" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(482, 240)
+
+[node name="Western United States" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(248, 311)
+
+[node name="Eastern United States" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(388, 327)
+
+[node name="Central America" parent="Continents/North America" instance=ExtResource("1_3td28")]
+position = Vector2(245, 417)
+
+[node name="South America" type="Node" parent="Continents"]
+
+[node name="Venezuela" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(376, 523)
+
+[node name="Brazil" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(514, 610)
+
+[node name="Peru" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(396, 645)
+
+[node name="Argentina" parent="Continents/South America" instance=ExtResource("1_3td28")]
+position = Vector2(426, 744)
+
+[node name="Africa" type="Node" parent="Continents"]
+
+[node name="North Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(819, 577)
+
+[node name="Egypt" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(942, 533)
+
+[node name="East Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(1023, 614)
+
+[node name="Central Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(953, 683)
+
+[node name="South Africa" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(976, 818)
+
+[node name="Madagascar" parent="Continents/Africa" instance=ExtResource("1_3td28")]
+position = Vector2(1128, 829)
+
+[node name="Europe" type="Node" parent="Continents"]
+
+[node name="Iceland" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(746, 185)
+
+[node name="Great Britain" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(725, 281)
+
+[node name="Scandinavia" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(869, 194)
+
+[node name="Russia" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(1030, 242)
+
+[node name="Northern Europe" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(874, 315)
+
+[node name="Southern Europe" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(917, 391)
+
+[node name="Western Europe" parent="Continents/Europe" instance=ExtResource("1_3td28")]
+position = Vector2(739, 431)
+
+[node name="Asia" type="Node" parent="Continents"]
+
+[node name="Ural" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1221, 197)
+
+[node name="Siberia" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1320, 153)
+
+[node name="Yakutsk" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1447, 102)
+
+[node name="Kamchatka" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1592, 125)
+
+[node name="Irkutsk" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1441, 217)
+
+[node name="Mongolia" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1454, 304)
+
+[node name="China" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1393, 406)
+
+[node name="Japan" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1654, 315)
+
+[node name="Afghanistan" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1206, 340)
+
+[node name="India" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1295, 474)
+
+[node name="Southeast Asia" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1446, 510)
+
+[node name="Middle East" parent="Continents/Asia" instance=ExtResource("1_3td28")]
+position = Vector2(1079, 480)
+
+[node name="Australia" type="Node" parent="Continents"]
+
+[node name="Indonesia" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1484, 694)
+
+[node name="New Guinea" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1657, 641)
+
+[node name="Western Australia" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1582, 828)
+
+[node name="Eastern Australia" parent="Continents/Australia" instance=ExtResource("1_3td28")]
+position = Vector2(1738, 794)

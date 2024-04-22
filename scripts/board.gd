@@ -2,9 +2,6 @@ extends Node
 class_name Board
 
 const Territory = preload("res://scenes/territory.tscn")
-var currentPlayer: int
-var playerQueue: Queue
-var players: Array[Player]
 var graph: Graph
 var current_game_state
 var continents
@@ -13,17 +10,10 @@ signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$"Continents/North America/Alaska".set_ownership(1)
-	playerQueue = Queue.new()
-	var player: Player
-	for i in range(5):
-		player = Player.new(i, 0)
-		players.append(player)
-		playerQueue.enqueue(player)
 		
 	
 	continents = connect_and_get_continent_dict()
 	var selected: Area2D
-	var currentPlayer: int = 0
 	
 	# collect territories into Dictionary
 	# key: continent
@@ -45,13 +35,7 @@ func _ready():
 	graph.add_edges(edges)
 	# draw_connections(graph)
 	# populate(edges)
-	currentPlayer = 0
 	# game_loop()
-	
-	
-	
-func _process(delta):
-	pass
 
 """
 Loops over every territory doing 3 main things:
@@ -106,4 +90,3 @@ func draw_connections(graph: Graph) -> void:
 
 func _on_territory_clicked(which: Territory):
 	territory_clicked.emit(which)
-	

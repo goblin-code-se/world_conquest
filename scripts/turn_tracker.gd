@@ -17,3 +17,5 @@ func next() -> Player:
 	_pointer = (_pointer + 1) % 5 # Wraparound logic for iteration over queue
 	return _players[_pointer]
 
+func get_all() -> Array[Player]:
+	return _players

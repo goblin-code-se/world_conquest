@@ -56,6 +56,12 @@ func dfs(start_node: int) -> Array:
 func get_adjacent_nodes(node_id: int) -> Array:
 	return _graph[node_id]
 
+func all_territories_owned() -> bool:
+	for node in _nodes:
+		if node.get_ownership() == 0:
+			return false
+	return true
+
 "
 func get_adjacent_territories(id: int) -> Array:
 	var adjacent_nodes: Array = []

@@ -1,9 +1,11 @@
 extends Node
 class_name Board
 
+"""Im momentarily commenting out everything playerQueue cuz it doesnt run with it"""
+
 const Territory = preload("res://scenes/territory.tscn")
 var currentPlayer: int
-var playerQueue: Queue
+#var playerQueue: Queue
 var players: Array[Player]
 var graph: Graph
 var current_game_state
@@ -13,12 +15,12 @@ signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$"Continents/North America/Alaska".set_ownership(1)
-	playerQueue = Queue.new()
+#	playerQueue = Queue.new()
 	var player: Player
 	for i in range(5):
 		player = Player.new(i, 0)
 		players.append(player)
-		playerQueue.enqueue(player)
+#		playerQueue.enqueue(player)
 		
 	
 	continents = connect_and_get_continent_dict()
@@ -107,3 +109,13 @@ func draw_connections(graph: Graph) -> void:
 func _on_territory_clicked(which: Territory):
 	territory_clicked.emit(which)
 	
+
+"""
+Rick!
+"""
+func player_controls_continent(player_id: int, continent_name: String):
+	var territories = continents[continent_name]
+	for territory in territories:
+		if territory.get_ownership() != player_id:
+			return false
+	return true

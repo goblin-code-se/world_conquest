@@ -47,6 +47,9 @@ func set_continent(continent: String) -> void:
 func increment_troops(count: int) -> void:
 	_troop_number += count
 	update_info()
+func decrement_troops(count: int) -> void:
+	_troop_number -= count
+	update_info()
 
 func get_troop_number() -> int:
 	return _troop_number

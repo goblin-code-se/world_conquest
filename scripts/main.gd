@@ -14,6 +14,8 @@ var players: Array[Player]
 var turn_number: int
 var Mission_mode: bool
 var territory_cards = []
+var conquered_one: bool = false
+var card_trade_count = 0
 
 @onready var board = $Board
 
@@ -81,18 +83,22 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 	
 	if defender_territory.get_troop_number() <= 0:
 		print(defender_territory, "conquered")
+		conquered_one = true
 		defender_territory.set_ownership(attacking_territory.get_ownership()) # this needs a method to get the conquered territory out of the owned territories of the attacked
 		current_player.add_territory(defender_territory)
 		attacking_territory.decrement_troops(attacker_dice_count)
 		defender_territory.increment_troops(attacker_dice_count)
-
+	print(territory_cards.size())
+ 
 
 func end_of_turn_draw_card(player):
-	if player.has_conquered():
+	if conquered_one == true:
 		var card = draw_territory_card()
 		player.add_card(card)
 		print("Player", player.get_id(), "drew a card:", card.name)
+		print(current_player.get_cards())
 		player.reset_conquest()
+		conquered_one = false
 
 func setup_territory_cards():
 	territory_cards = [
@@ -155,8 +161,6 @@ var mission_cards = [
 ]
 
 func draw_territory_card():
-	setup_territory_cards()
-	print(territory_cards.size())
 	if territory_cards.size() == 0:
 		print("No more territory cards available")
 		return territory_cards.pop_front()
@@ -183,6 +187,35 @@ func _on_attack_button_pressed() -> void:
 func _on_move_button_pressed() -> void:
 	change_game_state(GameState.MOVING_FROM)
 
+
+func trade_cards(player):
+	if current_player.can_trade():
+		var troops_awarded = calculate_card_bonus
+		current_player.increment_troops(troops_awarded)
+		card_trade_count += 1
+		current_player.remove_traded_cards()
+		print("Player", player.get_id(), "traded 1 set of cards for", troops_awarded, "troops")
+		current_player.trading_set_used()
+	else:
+		print("can't trade yet")
+		
+
+func calculate_card_bonus() -> int:
+	match card_trade_count:
+		0:
+			return 4
+		1:
+			return 6
+		2:
+			return 8
+		3:
+			return 10
+		4:
+			return 12
+		5:
+			return 15
+		_:
+			return 15 + (card_trade_count - 5)*5
 
 """
 main state machine function, handling clicks based on current game state
@@ -288,6 +321,7 @@ func handle_adding(which: Territory) -> void:
 				which.set_ownership(current_player.get_id())
 				current_player.add_territory(which)
 	if current_player.get_troops() == 0 and current_game_state != GameState.INITIAL_STATE:
+		trade_cards(current_player)
 		change_game_state(GameState.SELECT_ATTACKER)
 
 	$Ui.update_troop_count(current_player.get_troops())

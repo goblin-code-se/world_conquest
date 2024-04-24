@@ -3,23 +3,20 @@ class_name Board
 
 const Territory = preload("res://scenes/territory.tscn")
 var graph: Graph
-var current_game_state
 var continents
 
 signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$"Continents/North America/Alaska".set_ownership(1)
-		
-	
+	print("READY (board.gd)")
 	continents = connect_and_get_continent_dict()
 	var selected: Area2D
 	
 	# collect territories into Dictionary
 	# key: continent
 	# value: list of territories belonging to continent
-	var territories: Array = []
-	for continent: Array in continents.values():
+	var territories: Array[Territory] = []
+	for continent in continents.values():
 		territories.append_array(continent)
 	graph = Graph.new(territories)
 	
@@ -36,6 +33,7 @@ func _ready():
 	# draw_connections(graph)
 	# populate(edges)
 	# game_loop()
+
 
 """
 Loops over every territory doing 3 main things:

@@ -9,7 +9,7 @@ var _pointer: int
 func _init(arr: Array[Player]):
 	_players = arr
 	_pointer = 0
-
+	
 func peek() -> Player:
 	return _players[_pointer]
 

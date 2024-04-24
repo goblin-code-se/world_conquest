@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c67mjk5exq6xf"]
+[gd_scene load_steps=7 format=3 uid="uid://pwflgtmr2ak3"]
 
 [ext_resource type="Script" path="res://scripts/territory.gd" id="1_if7cs"]
 [ext_resource type="Texture2D" uid="uid://du353aamsl7h0" path="res://assets/faction 0.png" id="2_cyiv8"]
@@ -70,3 +70,4 @@ vertical_alignment = 1
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
+[connection signal="visibility_changed" from="HoverInfo" to="." method="_on_hover_info_visibility_changed"]

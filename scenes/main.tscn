@@ -11,4 +11,7 @@ script = ExtResource("1_mj1yr")
 
 [node name="Ui" parent="." instance=ExtResource("2_stmw1")]
 
+[node name="TurnTimer" type="Timer" parent="."]
+
 [connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]
+[connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

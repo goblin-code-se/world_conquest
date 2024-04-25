@@ -21,6 +21,9 @@ func update_timer(time_left: int):
 		text = str(time_left/60)+":"+str(time_left%60)
 	$MenuBar/Container/TurnCountdown.text = text
 
+func update_troop_count(count: int):
+	$MenuBar/Container/TroopCount.text = "Troops to add: " + str(count)
+
 func update_timer_hacky_donotuse(text: String):
 	$MenuBar/Container/TurnCountdown.text = text
 
@@ -45,7 +48,9 @@ enum GameState {
 
 func update_game_state(state: GameState) -> void:
 	$MenuBar/Container/GameState.text = GameState.keys()[state]
-	if state == GameState.INITIAL_STATE:
+	$MenuBar/Container/TroopCount.visible = state == GameState.ADDING_TROOPS
+
+	if state == GameState.INITIAL_STATE or state == GameState.ADDING_TROOPS:
 		$MenuBar/Container/SkipTurnButton.visible = false
 		$MenuBar/Container/EndTurnButton.visible = false
 		return

@@ -42,14 +42,17 @@ func connected(v: int,w: int) -> bool:
 performs depth first search
  - returns list of node IDs directly connected to start_node
 """
-func dfs(start_node: int) -> Array[Territory]:
-	var nodes = [start_node]
-	var current_player = get_node(start_node).get_ownership()
+func dfs(start_node: Territory) -> Array[Territory]:
+	var nodes: Array[Territory] = [start_node]
+	var current_player = start_node.get_ownership()
 	var checked = 0
 	while checked < nodes.size():
-		for node in _graph[nodes[checked]]:
-			if !(node in nodes) and get_node(node).get_ownership() == current_player:
-				nodes.append(node)
+		for node_id in _graph[nodes[checked].get_id()]:
+			var node_obj = get_node(node_id)
+			var unvisited = !(node_obj in nodes)
+			var player_owned = node_obj.get_ownership().get_id() == current_player.get_id()
+			if unvisited and player_owned:
+				nodes.append(node_obj)
 		checked += 1
 	return nodes
 
@@ -58,7 +61,7 @@ func get_adjacent_nodes(node_id: int):
 
 func all_territories_owned() -> bool:
 	for node in _nodes:
-		if node.get_ownership() == 0:
+		if node.get_ownership() == null:
 			return false
 	return true
 

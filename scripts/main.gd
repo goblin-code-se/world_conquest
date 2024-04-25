@@ -1,5 +1,6 @@
 extends Node
 
+const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to properly start at 5:00 and not 4:59
 var state: GameState
 var attacking_territory
 var defender_territory
@@ -58,6 +59,7 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	$Ui.update_timer($TurnTimer.get_time_left())
 	if state == GameState.INITIAL_STATE:
 		if Input.is_key_pressed(KEY_S) and not skip_lock:
 			skip_lock = true
@@ -102,7 +104,9 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 		print(defender_territory, "conquered")
 		conquered_one = true
 		defender_territory.set_ownership(attacking_territory.get_ownership()) # this needs a method to get the conquered territory out of the owned territories of the attacked
-		current_player.add_territory(defender_territory)
+		 
+		# not needed anymore, we don't keep track in player
+		#players.peek().add_territory(defender_territory)
 		attacking_territory.decrement_troops(attacker_dice_count)
 		defender_territory.increment_troops(attacker_dice_count)
 	print(territory_cards.size())
@@ -113,7 +117,7 @@ func end_of_turn_draw_card(player):
 		var card = draw_territory_card()
 		player.add_card(card)
 		print("Player", player.get_id(), "drew a card:", card.name)
-		print(current_player.get_cards())
+		print(players.peek().get_cards())
 		player.reset_conquest()
 		conquered_one = false
 
@@ -186,7 +190,7 @@ func draw_territory_card():
 		return card
 	
 func all_territories_owned():
-	if board_graph.all_territories_owned():
+	if $Board.graph.all_territories_owned():
 		return true
 
 
@@ -206,6 +210,7 @@ func _on_move_button_pressed() -> void:
 
 
 func trade_cards(player):
+	var current_player = players.peek()
 	if current_player.can_trade():
 		var troops_awarded = calculate_card_bonus
 		current_player.increment_troops(troops_awarded)
@@ -267,7 +272,7 @@ func calculate_continent_bonus(player: Player):
 						"Asia": 7, 
 						"Australia": 2}
 	for continent_name in continent_bonuses.keys():
-		if board.player_controls_continent(player.get_id(), continent_name):
+		if $Board.player_controls_continent(player.get_id(), continent_name):
 			bonus += continent_bonuses[continent_name]
 		return bonus
 	
@@ -293,10 +298,10 @@ func is_game_over():
 returns whether or not a move to and from two territories is valid
 """
 func valid_move(moving_from: Territory, moving_to: Territory) -> bool:
-	var connected_nodes = $Board.graph.dfs(moving_from.get_id())
+	var connected_nodes = $Board.graph.dfs(moving_from)
 	
 	var owned_by_player = moving_to.get_ownership() == players.peek()
-	var connected = moving_to.get_id() in connected_nodes
+	var connected = moving_to in connected_nodes
 	return owned_by_player and connected
 
 """
@@ -320,6 +325,7 @@ func handle_initial_adding(territory: Territory) -> void:
 	# Switch from initial to main game state
 	var arr = players.get_all()
 	if initial_counter == 125:
+		$TurnTimer.start(turn_time)
 		change_game_state(GameState.ADDING_TROOPS)
 		next_turn()
 
@@ -344,8 +350,9 @@ func handle_adding(territory: Territory) -> void:
 	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
 	if add_troop_to_territory(territory):
 		troops_to_add -= 1
+		$Ui.update_troop_count(troops_to_add)
 	if troops_to_add == 0:
-		trade_cards(current_player)
+		trade_cards(players.peek())
 		change_game_state(GameState.SELECT_ATTACKER)
 
 
@@ -431,7 +438,7 @@ func handle_moving_to(which: Territory) -> void:
 			print("valid movement")
 			move(moving_from, moving_to, 1)
 			# change_game_state(GameState.MOVING_FROM)
-			$Ui.end_turn()
+			next_turn()
 		else:
 			print("not reachable")
 			change_game_state(GameState.MOVING_FROM)
@@ -442,7 +449,7 @@ func handle_moving_to(which: Territory) -> void:
  - resets turn to adding troops, if not in initial state
 """
 func next_turn() -> void:
-	end_of_turn_draw_card(current_player)
+	end_of_turn_draw_card(players.peek())
 	if is_game_over() != null:
 		return
 
@@ -451,12 +458,25 @@ func next_turn() -> void:
 	while not players.next().get_troops():
 		pass
 	
+	$TurnTimer.start(turn_time)
 	$Ui.update_tallies(players._players, players.peek())
 	change_game_state(GameState.ADDING_TROOPS)
 	troops_to_add = players.peek().count_bonus_troops($Board)
+	$Ui.update_troop_count(troops_to_add)
 	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
 	print(troops_to_add)
 
 func skip_stage() -> void:
-	print("TODO")
+	print("Skipping?")
+	print(GameState.keys()[state])
+	var skip_to = {
+		GameState.SELECT_ATTACKER: GameState.MOVING_FROM,
+		GameState.SELECT_ATTACKED: GameState.MOVING_FROM,
+	}
+	if skip_to.get(state, null) != null:
+		change_game_state(skip_to[state])
 	pass
+
+
+func _on_turn_timer_timeout():
+	next_turn()

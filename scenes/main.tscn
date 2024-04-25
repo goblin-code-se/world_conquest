@@ -7,10 +7,8 @@
 [node name="Main" type="Node"]
 script = ExtResource("1_mj1yr")
 
-[node name="Board_Main" parent="." instance=ExtResource("1_3qqcc")]
+[node name="Board" parent="." instance=ExtResource("1_3qqcc")]
 
 [node name="Ui" parent="." instance=ExtResource("2_stmw1")]
 
-[connection signal="territory_clicked" from="Board_Main" to="." method="_on_board_main_territory_clicked"]
-[connection signal="attack_button_pressed" from="Ui" to="." method="_on_attack_button_pressed"]
-[connection signal="move_button_pressed" from="Ui" to="." method="_on_move_button_pressed"]
+[connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]

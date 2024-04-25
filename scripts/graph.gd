@@ -1,10 +1,10 @@
 class_name Graph
 	
-var _graph: Dictionary
-var _nodes: Array
-var _edges: Array
+var _graph
+var _nodes: Array[Territory]
+var _edges
 
-func _init(nodes: Array):
+func _init(nodes: Array[Territory]):
 	
 	_edges = []
 	_nodes = nodes
@@ -13,7 +13,7 @@ func _init(nodes: Array):
 		_graph[i] = []
 		nodes[i].set_id(i)
 
-func get_nodes() -> Array:
+func get_nodes() -> Array[Territory]:
 	return _nodes
 
 func get_node(index: int) -> Territory:
@@ -22,7 +22,7 @@ func get_node(index: int) -> Territory:
 func get_graph() -> Dictionary:
 	return _graph
 
-func get_edges() -> Array:
+func get_edges():
 	return _edges
 
 func add_edge(v: int, w: int) -> void:
@@ -30,7 +30,7 @@ func add_edge(v: int, w: int) -> void:
 	_graph[v].append(w)
 	_graph[w].append(v)
 
-func add_edges(edges: Array) -> void:
+func add_edges(edges) -> void:
 	for edge in edges:
 		add_edge(edge[0],edge[1])
 
@@ -42,7 +42,7 @@ func connected(v: int,w: int) -> bool:
 performs depth first search
  - returns list of node IDs directly connected to start_node
 """
-func dfs(start_node: int) -> Array:
+func dfs(start_node: int) -> Array[Territory]:
 	var nodes = [start_node]
 	var current_player = get_node(start_node).get_ownership()
 	var checked = 0
@@ -53,7 +53,7 @@ func dfs(start_node: int) -> Array:
 		checked += 1
 	return nodes
 
-func get_adjacent_nodes(node_id: int) -> Array:
+func get_adjacent_nodes(node_id: int):
 	return _graph[node_id]
 
 func all_territories_owned() -> bool:

@@ -2,7 +2,7 @@ extends Node2D
 class_name Territory
 
 var _continent: String
-var _who_owns: int
+var _owner: Player
 var _troop_number: int
 var _hover: bool
 var _selected: bool = false
@@ -14,7 +14,7 @@ signal territory_clicked(which)
 func _ready():
 	_continent = "test continent"
 	_troop_number = 0
-	_who_owns = 0
+	_owner = null
 	$TerritoryName.text = self.get_name()
 	update_info()
 	update_sprite()
@@ -28,16 +28,24 @@ func _process(delta):
 
 # Call everytime variables to do with territory information changes:
 func update_info() -> void:
+	
+	var player_name;
+	if _owner == null:
+		player_name = "Nobody"
+	else:
+		player_name = "Player {0}".format([_owner.get_id()])
+		
 	$TroopCount.text = str(_troop_number)
 	$HoverInfo.text = "continent: {0}
 	who_owns: {1}
-	graph_id: {2}".format([_continent, _who_owns, str(_graph_id)])
+	graph_id: {2}".format([_continent, player_name, str(_graph_id)])
 
-func get_ownership() -> int:
-	return _who_owns
+func get_ownership() -> Player:
+	return _owner
 
-func set_ownership(player: int) -> void:
-	_who_owns = player
+func set_ownership(player: Player) -> void:
+	_owner = player
+	update_info()
 	update_sprite()
 	
 func set_continent(continent: String) -> void:
@@ -56,7 +64,10 @@ func get_troop_number() -> int:
 	
 func update_sprite() -> void:
 	# no default case on match as who_owns should never not be in Player enum
-	match _who_owns:
+	if _owner == null:
+		return
+	
+	match _owner.get_id():
 		1:
 			$Sprite2D.texture = preload("res://assets/factions/blue faction.png")
 		2:
@@ -67,8 +78,6 @@ func update_sprite() -> void:
 			$Sprite2D.texture = preload("res://assets/factions/purple faction.png")
 		5:
 			$Sprite2D.texture = preload("res://assets/factions/yellow faction.png")
-		_:
-			pass
 
 func get_id() -> int:
 	return _graph_id
@@ -94,3 +103,10 @@ func _on_input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if _hover:
 			territory_clicked.emit(self)
+
+
+func _on_hover_info_visibility_changed():
+	if _owner == null:
+		return
+		
+	#update_info()

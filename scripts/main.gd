@@ -1,24 +1,20 @@
 extends Node
 
-var current_game_state: GameState
-var current_player: Player
+var state: GameState
 var attacking_territory
 var defender_territory
 var adjacent_territories
-var board_graph: Graph
-var edges: Array
 var moving_from: Territory
 var moving_to: Territory
 var continent_bonuses: Dictionary
-var players: Array[Player]
-var turn_number: int
 var Mission_mode: bool
 var territory_cards = []
 var conquered_one: bool = false
 var card_trade_count = 0
-
-@onready var board = $Board
-
+var players: TurnTracker
+var initial_counter: int = 0
+var troops_to_add: int
+var skip_lock := false
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -26,30 +22,51 @@ enum GameState {
 	ATTACK,
 	MOVING_FROM,
 	MOVING_TO,
-	INITIAL_STATE
+	INITIAL_STATE,
 }
-# Called when the node enters the scene tree for the first time.
+
 func _ready():
+	print("READY (main.gd)")
+
+	# Player initialization
+	var arr: Array[Player] = []
+	for i in range(1, 6):
+		arr.append(Player.new(i, 25))
+	players = TurnTracker.new(arr)
+
+	# Card init
 	setup_territory_cards()
 	print(territory_cards.size())
-	turn_number = 0
-	players = []
-	for i in range(5):
-		players.append(Player.new(i+1, 25))
-	current_player = players[0]
-	current_game_state = GameState.INITIAL_STATE
-	$Ui.update_game_state("INITIAL STATE")
-	board_graph = $Board_Main.graph
-	edges = board_graph.get_edges()
+
+	# Setup graph
+	continent_bonuses = {"North America": 5, 
+						"South America": 2, 
+						"Africa": 3, 
+						"Europe": 5, 
+						"Asia": 7, 
+						"Australia": 2}
+	
+	change_game_state(GameState.INITIAL_STATE)
+	
+	# Register buttons
+	$Ui.end_turn_clicked.connect(next_turn)
+	$Ui.skip_stage_clicked.connect(skip_stage)
+
+	# Mission mode
 	if Mission_mode == true:
 		assign_mission_cards_to_players(players)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	pass
+	if state == GameState.INITIAL_STATE:
+		if Input.is_key_pressed(KEY_S) and not skip_lock:
+			skip_lock = true
+			for territory in $Board.graph.get_nodes():
+				if not territory.get_troop_number():
+					handle_initial_adding(territory)
 
 """Rick!"""
-# var current_game_state = GameState.SELECT_ATTACKER # This shouldn't be left like that
+
 # Recommendation: In _ready() specify the game state at every state. There should be a general "do nothing" state and be changed for ATTACK when, welp, ATTACKing
 # Also, these ATTACKing/defender could be added to the ATTACK() function, and just call it when, WELP, ATTACKing, so it re-starts
 #Also, probably a more descriptive name would be populate_adjacent_list or something like that
@@ -220,9 +237,9 @@ func calculate_card_bonus() -> int:
 """
 main state machine function, handling clicks based on current game state
 """
-func _on_board_main_territory_clicked(which: Territory) -> void:
+func _on_board_territory_clicked(which: Territory) -> void:
 	var initial_troops_depleted: bool = false
-	match current_game_state:
+	match state:
 		GameState.ADDING_TROOPS:
 			handle_adding(which)
 		GameState.SELECT_ATTACKER:
@@ -234,8 +251,12 @@ func _on_board_main_territory_clicked(which: Territory) -> void:
 		GameState.MOVING_TO:
 			handle_moving_to(which)
 		GameState.INITIAL_STATE:
-			handle_initial_adding(which)
-				
+			if Input.is_key_pressed(KEY_SHIFT):
+				while which.get_ownership() == players.peek():
+					handle_initial_adding(which)
+			else:
+				handle_initial_adding(which)
+
 
 func calculate_continent_bonus(player: Player):
 	var bonus = 0
@@ -256,27 +277,27 @@ func calculate_continent_bonus(player: Player):
 
 """
 checks if every node in the board belongs to one player id (game over)
- - returns -1 if no winner
+ - returns null if no winner
  - returns player id of winner otherwise
 """
 
-func is_game_over() -> int:
-	var winner = board_graph.get_nodes()[0].get_ownership()
-	for node in board_graph.get_nodes():
+func is_game_over():
+	var graph = $Board.graph
+	var winner = graph.get_nodes()[0].get_ownership()
+	for node in graph.get_nodes():
 		if node.get_ownership() != winner:
-			return -1
+			return null
 	return winner
 
 """
 returns whether or not a move to and from two territories is valid
- - returns true if both territories are connected and belong to same player
- - returns false otherwise
 """
 func valid_move(moving_from: Territory, moving_to: Territory) -> bool:
-	var connected_nodes = board_graph.dfs(moving_from.get_id())
-	if moving_to.get_ownership() == current_player.get_id() and moving_to.get_id() in connected_nodes:
-		return true
-	return false
+	var connected_nodes = $Board.graph.dfs(moving_from.get_id())
+	
+	var owned_by_player = moving_to.get_ownership() == players.peek()
+	var connected = moving_to.get_id() in connected_nodes
+	return owned_by_player and connected
 
 """
 moves an amount of troops from one territory to the other
@@ -285,20 +306,28 @@ func move(from: Territory, to: Territory, amount: int) -> void:
 	# TODO: allow for multiple troops
 	from.increment_troops(-amount)
 	to.increment_troops(amount)
-	
-"""
-handles specific rules of initial map population, passing off bulk to handle_adding()
-"""
-func handle_initial_adding(which: Territory) -> void:
-	# Check if the territory clicked is either unowned or owned by the current player
-	if which.get_ownership() == 0 or which.get_ownership() == current_player.get_id():
-		handle_adding(which)
-		if all_territories_owned() and current_player.get_troops() > 0:
-			return
-		next_turn()
-	else:
-		print("already owned.")
 
+
+func handle_initial_adding(territory: Territory) -> void:
+	if add_troop_to_territory(territory):
+		initial_counter += 1
+		if initial_counter < 42 or initial_counter in [59, 76, 93, 109]:
+			players.next()
+			$Ui.update_tallies(players._players, players.peek())
+	
+	$Ui.update_timer_hacky_donotuse(str(initial_counter))
+
+	# Switch from initial to main game state
+	var arr = players.get_all()
+	if initial_counter == 125:
+		change_game_state(GameState.ADDING_TROOPS)
+		next_turn()
+
+func board_check_no_unclaimed():
+	for node in $Board.graph.get_nodes():
+		if node.get_ownership() == null:
+			return false
+	return true
 
 """
 checks whether an adding click is valid via:
@@ -309,22 +338,35 @@ checks whether an adding click is valid via:
 		- if on 0, setting to next state of turn (SELECT_ATTACKER)
 if valid deducts 1 from player troop count, and adds 1 troop to territory that was clicked
 """
+func handle_adding(territory: Territory) -> void:
+	var player = players.peek()
 
-
-func handle_adding(which: Territory) -> void:
-	if which.get_ownership() == current_player.get_id() or which.get_ownership() == 0:
-		if current_player.get_troops() > 0:
-			print("Adding troops")
-			which.increment_troops(1) # can add multiple at a time eventually to help with turns of huge amounts of troops
-			current_player.increment_troops(-1)
-			if which.get_ownership() == 0:
-				which.set_ownership(current_player.get_id())
-				current_player.add_territory(which)
-	if current_player.get_troops() == 0 and current_game_state != GameState.INITIAL_STATE:
+	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
+	if add_troop_to_territory(territory):
+		troops_to_add -= 1
+	if troops_to_add == 0:
 		trade_cards(current_player)
 		change_game_state(GameState.SELECT_ATTACKER)
 
-	$Ui.update_troop_count(current_player.get_troops())
+
+func add_troop_to_territory(territory: Territory) -> bool:
+	# Player is not allowed to occupy this territory
+	if territory.get_ownership() != players.peek() and territory.get_ownership() != null:
+		return false
+
+	# Player has no troops
+	#if players.peek().get_troops() == 0:
+		#return false
+	
+	territory.increment_troops(1) # can add multiple at a time eventually to help with turns of huge amounts of troops
+	players.peek().increment_troops(1)
+	
+	# Claim territory
+	if territory.get_ownership() == null:
+		territory.set_ownership(players.peek())
+	
+	return true
+
 
 		
 """
@@ -332,7 +374,7 @@ checks whether it is possible to attack from a territory, valid if:
 	- it belongs to player clicking
 """
 func handle_selecting_attacker(which: Territory) -> void:
-	if which.get_ownership() == current_player.get_id():
+	if which.get_ownership() == players.peek():
 		attacking_territory = which
 		print("Attacker territory: ", which.get_id())
 		change_game_state(GameState.SELECT_ATTACKED)
@@ -340,8 +382,8 @@ func handle_selecting_attacker(which: Territory) -> void:
 		print("not your territory bro")
 
 func change_game_state(game_state: GameState):
-	current_game_state = game_state
-	$Ui.update_game_state(GameState.keys()[game_state])
+	state = game_state
+	$Ui.update_game_state(state)
 
 """
 checks whether it is possible to attack a territory from a previous valid attacking territory via:
@@ -349,8 +391,8 @@ checks whether it is possible to attack a territory from a previous valid attack
 	- territory doesn't belong to current player
 """
 func handle_select_attacked(which: Territory):
-	var adjacent: bool = which.get_id() in board_graph.get_adjacent_nodes(attacking_territory.get_id())
-	if adjacent and which.get_ownership() != current_player.get_id(): #and which.get_ownership() != attacking_territory.get_ownership():
+	var adjacent: bool = which.get_id() in $Board.graph.get_adjacent_nodes(attacking_territory.get_id())
+	if adjacent and which.get_ownership() != players.peek(): #and which.get_ownership() != attacking_territory.get_ownership():
 		defender_territory = which
 		change_game_state(GameState.SELECT_ATTACKED)
 		print("defender: ", which.get_id())
@@ -366,7 +408,7 @@ checks whether it is valid to move troops from a territory via:
 if valid, changes state to MOVING TO
 """
 func handle_moving_from(which: Territory) -> void:
-	if which.get_ownership() == current_player.get_id() and which.get_troop_number() > 1:
+	if which.get_ownership() == players.peek() and which.get_troop_number() > 1:
 		moving_from = which
 		change_game_state(GameState.MOVING_TO)
 	else:
@@ -383,46 +425,38 @@ if not valid:
 	- changes state back to MOVING_FROM to allow for reattempt
 """
 func handle_moving_to(which: Territory) -> void:
-	if which.get_ownership() == current_player.get_id():
+	if which.get_ownership() == players.peek():
 		moving_to = which
 		if valid_move(moving_from, moving_to):
 			print("valid movement")
 			move(moving_from, moving_to, 1)
 			# change_game_state(GameState.MOVING_FROM)
-			next_turn()
+			$Ui.end_turn()
 		else:
 			print("not reachable")
 			change_game_state(GameState.MOVING_FROM)
 	else:
 		print("not your territory")
 
-# TODO: get total bonus to add on top of player troop incrementation
-func get_bonuses() -> int:
-	var bonus = 0
-	return bonus
-	
 """
-adds specified amount of troops to player based on risk rules
-"""
-func add_troops_to_player() -> void:
-	var TroopCount = $Ui/MenuBar/Container/TroopCount
-	
-	var increment = max(3, current_player.get_owned().size()/3)
-	increment += get_bonuses()
-	current_player.increment_troops(increment)
-	TroopCount.text = "Troop Count: {0}".format([current_player.get_troops()])
-	
-
-"""
- - iterates player queue via modular arithmetic
  - resets turn to adding troops, if not in initial state
 """
 func next_turn() -> void:
 	end_of_turn_draw_card(current_player)
-	print(current_player.get_owned())
-	turn_number += 1
-	current_player = players[turn_number % players.size()]
-	if current_game_state != GameState.INITIAL_STATE:
-		add_troops_to_player()
-		change_game_state(GameState.ADDING_TROOPS)
-	$Ui.update_turn_ticker(current_player.get_id())
+	if is_game_over() != null:
+		return
+
+	# go to next player until current player has troops
+	# while loop is empty as all logic is in condition
+	while not players.next().get_troops():
+		pass
+	
+	$Ui.update_tallies(players._players, players.peek())
+	change_game_state(GameState.ADDING_TROOPS)
+	troops_to_add = players.peek().count_bonus_troops($Board)
+	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
+	print(troops_to_add)
+
+func skip_stage() -> void:
+	print("TODO")
+	pass

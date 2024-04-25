@@ -5,19 +5,18 @@ class_name Player
 
 var _id: int
 var _troops: int
-var _owned_territories: Array
 var _cards: Array
 var _conquered_one: bool = false
 var sets: int = 0
+var _initial_troop_hand: int
 
-func _init(id: int, troops:int):
+func _init(id: int, initial_troops:int):
 	_id = id
-	_troops = troops
-	_owned_territories = []
 	_cards = []
-
-func get_owned() -> Array:
-	return _owned_territories
+	_initial_troop_hand = initial_troops
+	
+func get_owned(board: Board) -> Array[Territory]:
+	return board.graph.get_nodes().filter(func(territory: Territory): territory.get_ownership() == self)
 	
 func get_troops() -> int:
 	return _troops
@@ -32,17 +31,8 @@ func increment_troops(i: int) -> void:
 Rick!
 """
 
-func decrement_troops(i: int) -> void:
-	_troops -= i
-
-func add_territory(territory):
-	_owned_territories.append(territory)
-
 func add_card(card):
 	_cards.append(card)
-
-func remove_territory(territory):
-	_owned_territories.erase(territory)
 
 func has_conquered() -> bool:
 	if _conquered_one == true:
@@ -115,3 +105,11 @@ func count_tradeable_sets():
 
 func trading_set_used() -> void:
 	sets -=1
+
+func count_bonus_troops(board: Board) -> int:
+	return max(3, self.get_owned(board).size() / 3) + get_bonuses()
+
+# TODO: get total bonus to add on top of player troop incrementation
+func get_bonuses() -> int:
+	var bonus = 0
+	return bonus

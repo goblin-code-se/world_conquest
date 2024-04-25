@@ -63,10 +63,12 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "Troop Count: 0"
 
 [node name="MoveButton" type="Button" parent="MenuBar/Container"]
+visible = false
 layout_mode = 2
 text = "MOVE"
 
 [node name="AttackButton" type="Button" parent="MenuBar/Container"]
+visible = false
 layout_mode = 2
 text = "ATTACK"
 
@@ -75,7 +77,14 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
 
-[node name="Button" type="Button" parent="MenuBar/Container"]
+[node name="SkipTurnButton" type="Button" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 16
+text = "Skip"
+
+[node name="EndTurnButton" type="Button" parent="MenuBar/Container"]
 custom_minimum_size = Vector2(180, 70)
 layout_mode = 2
 size_flags_vertical = 4
@@ -103,5 +112,6 @@ theme_override_font_sizes/font_size = 32
 
 [connection signal="pressed" from="MenuBar/Container/MoveButton" to="." method="_on_move_button_pressed"]
 [connection signal="pressed" from="MenuBar/Container/AttackButton" to="." method="_on_attack_button_pressed"]
-[connection signal="pressed" from="MenuBar/Container/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="MenuBar/Container/SkipTurnButton" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="MenuBar/Container/EndTurnButton" to="." method="_on_button_pressed"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

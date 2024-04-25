@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal skip_stage_clicked
 signal end_turn_clicked
+signal trade_clicked
 signal move_clicked
 signal attack_clicked
 
@@ -9,6 +10,7 @@ func _ready():
 	print("READY (ui.gd)")
 	$MenuBar/Container/SkipTurnButton.pressed.connect(func(): skip_stage_clicked.emit())
 	$MenuBar/Container/EndTurnButton.pressed.connect(func(): end_turn_clicked.emit())
+	$MenuBar/Container/TradeButton.pressed.connect(func(): trade_clicked.emit())
 	$MenuBar/Container/MoveButton.pressed.connect(func(): move_clicked.emit())
 	$MenuBar/Container/AttackButton.pressed.connect(func(): attack_clicked.emit())
 func update_timer(time_left: int):
@@ -49,7 +51,8 @@ enum GameState {
 func update_game_state(state: GameState) -> void:
 	$MenuBar/Container/GameState.text = GameState.keys()[state]
 	$MenuBar/Container/TroopCount.visible = state == GameState.ADDING_TROOPS
-
+	$MenuBar/Container/TradeButton.visible = state == GameState.ADDING_TROOPS
+	
 	if state == GameState.INITIAL_STATE or state == GameState.ADDING_TROOPS:
 		$MenuBar/Container/SkipTurnButton.visible = false
 		$MenuBar/Container/EndTurnButton.visible = false

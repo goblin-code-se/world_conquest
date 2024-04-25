@@ -77,6 +77,13 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
 
+[node name="TradeButton" type="Button" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 16
+text = "Trade Cards"
+
 [node name="SkipTurnButton" type="Button" parent="MenuBar/Container"]
 custom_minimum_size = Vector2(180, 70)
 layout_mode = 2

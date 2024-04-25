@@ -52,7 +52,8 @@ func _ready():
 	# Register buttons
 	$Ui.end_turn_clicked.connect(next_turn)
 	$Ui.skip_stage_clicked.connect(skip_stage)
-
+	$Ui.trade_clicked.connect(func(): trade_cards())
+	
 	# Mission mode
 	if Mission_mode == true:
 		assign_mission_cards_to_players(players)

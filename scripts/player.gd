@@ -7,10 +7,8 @@ var _id: int
 var _troops: int
 var _cards: Array
 var _conquered_one: bool = false
-#var sets: int = 0
 var _initial_troop_hand: int
 var trade_sets = []
-#var already_traded: bool = false
 
 func _init(id: int, initial_troops:int):
 	_id = id
@@ -33,7 +31,7 @@ func decrement_player_troops(i: int) -> void:
 	_troops -=i
 
 """
-Rick!
+Card logic
 """
 
 func add_card(card):
@@ -43,7 +41,6 @@ func has_conquered() -> bool:
 	if _conquered_one == true:
 		return true # throughout heaven and earth, i alone am the conquered one
 	else:
-		print("why tf this not working")
 		return false
 
 func reset_conquest():
@@ -73,7 +70,7 @@ func count_tradeable_sets() -> Array:
 			card_indices['artillery'].pop_front()
 			])
 	
-	# Check for sets of three of a kind
+	# Check for sets of three
 	for symbol in card_indices.keys():
 		while card_indices[symbol].size() >= 3:
 			trade_sets.append([
@@ -101,8 +98,6 @@ func count_tradeable_sets() -> Array:
 
 
 func trading_set_used() -> void:
-	#sets -=1
-	#already_traded = true
 	var indices_to_remove = []
 	for trade_set in trade_sets:
 		indices_to_remove += trade_set
@@ -121,6 +116,3 @@ func get_bonuses() -> int:
 
 func sort_desc(a, b):
 	return b - a
-"
-func get_has_player_traded_already():
-	return already_traded"

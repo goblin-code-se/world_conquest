@@ -57,6 +57,7 @@ func increment_troops(count: int) -> void:
 	update_info()
 func decrement_troops(count: int) -> void:
 	_troop_number -= count
+	_owner.decrement_player_troops(count)
 	update_info()
 
 func get_troop_number() -> int:

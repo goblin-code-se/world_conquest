@@ -16,6 +16,8 @@ var players: TurnTracker
 var initial_counter: int = 0
 var troops_to_add: int
 var skip_lock := false
+var troops_awarded: int
+var already_traded: bool = false
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -52,7 +54,7 @@ func _ready():
 	# Register buttons
 	$Ui.end_turn_clicked.connect(next_turn)
 	$Ui.skip_stage_clicked.connect(skip_stage)
-	$Ui.trade_clicked.connect(func(): trade_cards())
+	$Ui.trade_clicked.connect(func(): _on_trade_clicked())
 	
 	# Mission mode
 	if Mission_mode == true:
@@ -100,6 +102,7 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 	
 	attacking_territory.decrement_troops(attacker_losses)
 	defender_territory.decrement_troops(defender_losses)
+	#defender.decrement_player_troops(defender_losses)
 	
 	if defender_territory.get_troop_number() <= 0:
 		print(defender_territory, "conquered")
@@ -117,7 +120,7 @@ func end_of_turn_draw_card(player):
 	if conquered_one == true:
 		var card = draw_territory_card()
 		player.add_card(card)
-		print("Player", player.get_id(), "drew a card:", card.name)
+		print("Player ", player.get_id(), " drew a card:", card.name)
 		print(players.peek().get_cards())
 		player.reset_conquest()
 		conquered_one = false
@@ -213,12 +216,17 @@ func _on_move_button_pressed() -> void:
 func trade_cards(player):
 	var current_player = players.peek()
 	if current_player.can_trade():
-		var troops_awarded = calculate_card_bonus
-		current_player.increment_troops(troops_awarded)
+		troops_awarded = calculate_card_bonus()
+		#current_player.increment_troops(troops_awarded)
 		card_trade_count += 1
-		current_player.remove_traded_cards()
-		print("Player", player.get_id(), "traded 1 set of cards for", troops_awarded, "troops")
+		#current_player.remove_traded_cards()
+		print("Player ", player.get_id(), " traded 1 set of cards for ", troops_awarded, " troops")
 		current_player.trading_set_used()
+		troops_to_add += troops_awarded
+		$Ui.update_troop_count(troops_to_add)
+		print(already_traded)
+		already_traded = true
+		print(already_traded)
 	else:
 		print("can't trade yet")
 		
@@ -266,18 +274,17 @@ func _on_board_territory_clicked(which: Territory) -> void:
 
 func calculate_continent_bonus(player: Player):
 	var bonus = 0
-	continent_bonuses = {"North America": 5, 
-						"South America": 2, 
-						"Africa": 3, 
-						"Europe": 5, 
-						"Asia": 7, 
-						"Australia": 2}
 	for continent_name in continent_bonuses.keys():
 		if $Board.player_controls_continent(player.get_id(), continent_name):
 			bonus += continent_bonuses[continent_name]
 		return bonus
 	
 
+func _on_trade_clicked():
+	print("this thing is working")
+	if  already_traded == false:
+		trade_cards(players.peek())
+	else: print("already traded!")
 
 """John!"""
 
@@ -353,7 +360,9 @@ func handle_adding(territory: Territory) -> void:
 		troops_to_add -= 1
 		$Ui.update_troop_count(troops_to_add)
 	if troops_to_add == 0:
-		trade_cards(players.peek())
+		#trade_cards(players.peek())
+		already_traded = false
+		print("now already traded state is: ", already_traded)
 		change_game_state(GameState.SELECT_ATTACKER)
 
 
@@ -456,7 +465,9 @@ func next_turn() -> void:
 
 	# go to next player until current player has troops
 	# while loop is empty as all logic is in condition
+	#print(players.next().get_troops())
 	while not players.next().get_troops():
+		print(players.peek().get_troops())
 		pass
 	
 	$TurnTimer.start(turn_time)

@@ -7,8 +7,10 @@ var _id: int
 var _troops: int
 var _cards: Array
 var _conquered_one: bool = false
-var sets: int = 0
+#var sets: int = 0
 var _initial_troop_hand: int
+var trade_sets = []
+#var already_traded: bool = false
 
 func _init(id: int, initial_troops:int):
 	_id = id
@@ -26,6 +28,9 @@ func get_id() -> int:
 
 func increment_troops(i: int) -> void:
 	_troops += i
+
+func decrement_player_troops(i: int) -> void:
+	_troops -=i
 
 """
 Rick!
@@ -48,63 +53,63 @@ func get_cards() -> Array:
 	return _cards
 
 func can_trade():
-	if count_tradeable_sets() > 0:
+	if count_tradeable_sets().size() > 0:
 		return true
 	else: return false
 
-func count_tradeable_sets():
-	var infantry = 0
-	var cavalry = 0
-	var artillery = 0
-	var wildcards = 0
-	
-	for card in _cards:
-		match card['symbol']:
-			"infantry":
-				infantry += 1
-			"cavalry":
-				cavalry += 1
-			"artillery":
-				artillery += 1
-			"wild":
-				wildcards += 1
 
-	
-	while wildcards > 0 and (infantry > 1 or cavalry > 1 or artillery > 1):
-		if infantry > 1:
-			sets += 1
-			infantry -= 2
-			wildcards -= 1
-		elif cavalry > 1:
-			sets += 1
-			cavalry -= 2
-			wildcards -= 1
-		elif artillery > 1:
-			sets += 1
-			artillery -= 2
-			wildcards -= 1
-			
-	while infantry > 0 and cavalry > 0 and artillery > 0:
-		sets += 1
-		infantry -= 1
-		cavalry -= 1
-		artillery -= 1
+func count_tradeable_sets() -> Array:
+	var card_indices = {"infantry": [], "cavalry": [], "artillery": [], "wild": []}
+	# Organize cards by type and collect indices
+	for i in range(_cards.size()):
+		var card = _cards[i]
+		card_indices[card['symbol']].append(i)
 		
-	# Calculate sets of three of a kind
-	while infantry >= 3:
-		sets += 1
-		infantry -= 3
-	while cavalry >= 3:
-		sets += 1
-		cavalry -= 3
-	while artillery >= 3:
-		sets += 1
-		artillery -= 3
+	# Check for one of each type
+	while card_indices['infantry'].size() > 0 and card_indices['cavalry'].size() > 0 and card_indices['artillery'].size() > 0:
+		trade_sets.append([
+			card_indices['infantry'].pop_front(),
+			card_indices['cavalry'].pop_front(),
+			card_indices['artillery'].pop_front()
+			])
 	
-	return sets
+	# Check for sets of three of a kind
+	for symbol in card_indices.keys():
+		while card_indices[symbol].size() >= 3:
+			trade_sets.append([
+				card_indices[symbol].pop_front(),
+				card_indices[symbol].pop_front(),
+				card_indices[symbol].pop_front()
+				])
+	
+	# Check for wild card sets
+	while card_indices['wild'].size() > 0 and (card_indices['infantry'].size() > 1 or card_indices['cavalry'].size() > 1 or card_indices['artillery'].size() > 1):
+		var used_cards = [card_indices['wild'].pop_front()]
+		var added = false
+		for symbol in ['infantry', 'cavalry', 'artillery']:
+			if card_indices[symbol].size() > 1:
+				used_cards.append(card_indices[symbol].pop_front())
+				used_cards.append(card_indices[symbol].pop_front())
+				trade_sets.append(used_cards)
+				added = true
+				break
+		if not added:
+			card_indices['wild'].insert(0, used_cards[0]) # Return the wild card if not used
+	
+	return trade_sets
+
+
 
 func trading_set_used() -> void:
-	sets -=1
+	#sets -=1
+	#already_traded = true
+	var indices_to_remove = []
+	for trade_set in trade_sets:
+		indices_to_remove += trade_set
+	
+	indices_to_remove.sort_custom(sort_desc)
+	for index in indices_to_remove:
+		_cards.remove_at(index)
 
 func count_bonus_troops(board: Board) -> int:
 	return max(3, self.get_owned(board).size() / 3) + get_bonuses()
@@ -113,3 +118,9 @@ func count_bonus_troops(board: Board) -> int:
 func get_bonuses() -> int:
 	var bonus = 0
 	return bonus
+
+func sort_desc(a, b):
+	return b - a
+"
+func get_has_player_traded_already():
+	return already_traded"

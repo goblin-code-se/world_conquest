@@ -22,8 +22,9 @@ func _ready():
 		territories.append_array(continent)
 	graph = Graph.new(territories)
 	
+	"deleted duplicated [1,3 edge]. changed edge [2,4] to [6,4]"
 	# Disgustingly long list of edges, maybe port to text file?
-	var edges = [[0,1],[0,3],[1,3],[1,2],[1,3],[1,4],[2,4],[2,5],[3,6],[3,4],[4,5],[4,7],[5,7],[6,7],[6,8],[7,8], # North America Edges
+	var edges = [[0,1],[0,3],[1,3],[1,2],[1,4],[6,4],[2,5],[3,6],[3,4],[4,5],[4,7],[5,7],[6,7],[6,8],[7,8], # North America Edges
 	[9,10],[9,11],[10,11],[10,12],[11,12], # South America Edges
 	[13,14],[13,15],[13,16],[14,15],[15,16],[15,17],[15,18],[16,17],[17,18], # Africa Edges
 	[19,21],[19,20],[20,21],[20,23],[20,25],[21,23],[21,22],[22,23],[22,24],[23,24],[23,25],[24,25], # Europe Edges

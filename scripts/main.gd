@@ -168,7 +168,9 @@ func setup_territory_cards():
 		{"name": "Indonesia", "symbol": "artillery"},
 		{"name": "New Guinea", "symbol": "infantry"},
 		{"name": "Western Australia", "symbol": "artillery"},
-		{"name": "Eastern Australia", "symbol": "artillery"}
+		{"name": "Eastern Australia", "symbol": "artillery"},
+		{"name": "Wildcard 1", "symbol": "wild"},
+		{"name": "Wildcard 2", "symbol": "wild"}
 	]
 	territory_cards.shuffle()
 

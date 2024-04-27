@@ -11,6 +11,8 @@ var _initial_troop_hand: int
 var trade_sets = []
 var traded_cards = []
 var indices_to_remove = []
+var owned: Array[Territory] = []
+#var territory_in_card_owned:bool = false
 
 func _init(id: int, initial_troops:int):
 	_id = id
@@ -20,6 +22,21 @@ func _init(id: int, initial_troops:int):
 func get_owned(board: Board) -> Array[Territory]:
 	return board.graph.get_nodes().filter(func(territory: Territory): territory.get_ownership() == self)
 	
+""""
+This duplication is, as of now, on purpose.
+"""
+
+func get_out_of_owned(territory: Territory) -> void:
+	owned.erase(territory)
+
+func get_owned_duplicated(board: Board) -> Array[Territory]:
+	for territory in board.graph.get_nodes():
+		if territory.get_ownership() == self and territory not in owned:
+			owned.append(territory)
+	return owned
+	
+
+
 func get_troops() -> int:
 	return _troops
 
@@ -100,7 +117,8 @@ func count_tradeable_sets() -> Array:
 
 
 
-func trading_set_used(territory_cards: Array) -> void:
+func trading_set_used(territory_cards: Array, board: Board) -> void:
+	var cards_to_check_ownership = []
 	for trade_set in trade_sets:
 		indices_to_remove += trade_set
 	
@@ -108,8 +126,11 @@ func trading_set_used(territory_cards: Array) -> void:
 	
 	for index in indices_to_remove:
 		print("the traded cards are: ", _cards[index])
+		cards_to_check_ownership.append(_cards[index])
 		territory_cards.append(_cards[index])
 		_cards.remove_at(index)
+	
+	award_extra_troops_if_territory_owned(board, cards_to_check_ownership)
 	
 	territory_cards.shuffle()
 	traded_cards.clear()
@@ -118,12 +139,32 @@ func trading_set_used(territory_cards: Array) -> void:
 
 
 func count_bonus_troops(board: Board) -> int:
-	return max(3, self.get_owned(board).size() / 3) + get_bonuses()
+	return max(3,self.get_owned_duplicated(board).size()/3) # + get_bonuses()
 
-# TODO: get total bonus to add on top of player troop incrementation
+"# TODO: get total bonus to add on top of player troop incrementation
 func get_bonuses() -> int:
 	var bonus = 0
-	return bonus
+	return bonus"
 
 func sort_desc(a, b):
 	return b - a
+
+func award_extra_troops_if_territory_owned(board: Board, traded_cards: Array) -> void:
+	var owned_territories = get_owned_duplicated(board)
+	var territories_to_award = [] 
+	
+	print(owned_territories)
+	
+	
+	for card in traded_cards:
+		for territory in owned_territories:
+			if territory.get_name() == card["name"]:
+				territories_to_award.append(territory)
+	
+	#print(territories_to_award)
+	
+	if territories_to_award.size() > 0:
+		var random_index = randi() % territories_to_award.size()
+		var selected_territory = territories_to_award[random_index]
+		selected_territory.increment_troops(2)
+		print("Added 2 extra troops to ", selected_territory.get_name())

@@ -18,6 +18,7 @@ var troops_to_add: int
 var skip_lock := false
 var troops_awarded: int
 var already_traded: bool = false
+var board: Board
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -39,7 +40,7 @@ func _ready():
 
 	# Card init
 	setup_territory_cards()
-	print(territory_cards.size())
+	#print(territory_cards.size())
 
 	# Setup graph
 	continent_bonuses = {"North America": 5, 
@@ -108,14 +109,14 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 	attacking_territory.decrement_troops(attacker_losses)
 	defender_territory.decrement_troops(defender_losses)
 	#defender.decrement_player_troops(defender_losses)
-	print("troops of the attacker of ID ", attacker_id, " now are ", attacker.get_troops())
-	print("troops of the defender of ID ", defender_id, " now are ", defender.get_troops())
+	#print("troops of the attacker of ID ", attacker_id, " now are ", attacker.get_troops())
+	#print("troops of the defender of ID ", defender_id, " now are ", defender.get_troops())
 	
 	if defender_territory.get_troop_number() <= 0:
 		print(defender_territory, "conquered")
 		conquered_one = true
 		defender_territory.set_ownership(attacking_territory.get_ownership()) # this needs a method to get the conquered territory out of the owned territories of the attacked
-		 
+		defender.get_out_of_owned(defender_territory)
 		# not needed anymore, we don't keep track in player
 		#players.peek().add_territory(defender_territory)
 		attacking_territory.decrement_troops(attacker_dice_count)
@@ -123,12 +124,12 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 	
 	#print(territory_cards.size())
 	if defender.get_troops() == 0:
-		print("defender cards: ", defender.get_cards())
-		print(defender_id, " eliminated. Cards passing to", attacker)
-		print("attacker cards: ", attacker.get_cards())
+		#print("defender cards: ", defender.get_cards())
+		#print(defender_id, " eliminated. Cards passing to", attacker)
+		#print("attacker cards: ", attacker.get_cards())
 		for card in defender.get_cards():
 			attacker.add_card(card)
-		print("attacker cards now: ", attacker.get_cards())
+		#print("attacker cards now: ", attacker.get_cards())
 	if attacker.get_cards().size() >= 5:
 		print("You have accumulated 5 or more cards! You must trade now!")
 		$TurnTimer.start(turn_time)
@@ -144,7 +145,7 @@ func end_of_turn_draw_card(player):
 		var card = draw_territory_card()
 		player.add_card(card)
 		print("Player ", player.get_id(), " drew a card:", card.name)
-		print(players.peek().get_cards())
+		print("cards of player ", player.get_id(), " are: ", player.get_cards())
 		player.reset_conquest()
 		conquered_one = false
 
@@ -246,7 +247,7 @@ func trade_cards(player):
 		card_trade_count += 1
 		#current_player.remove_traded_cards()
 		print("Player ", player.get_id(), " traded 1 set of cards for ", troops_awarded, " troops")
-		player.trading_set_used(territory_cards)
+		player.trading_set_used(territory_cards, $Board)
 		#player.reset_traded_cards()
 		troops_to_add += troops_awarded
 		$Ui.update_troop_count(troops_to_add)
@@ -303,7 +304,8 @@ func calculate_continent_bonus(player: Player):
 	for continent_name in continent_bonuses.keys():
 		if $Board.player_controls_continent(player.get_id(), continent_name):
 			bonus += continent_bonuses[continent_name]
-		return bonus
+			print("Player ", player.get_id()," controls the continent ", continent_name, " thus gets awarded ", bonus, " extra troops.")
+	return bonus
 	
 
 func _on_trade_clicked():
@@ -348,6 +350,7 @@ func move(from: Territory, to: Territory, amount: int) -> void:
 
 func handle_initial_adding(territory: Territory) -> void:
 	if add_troop_to_territory(territory):
+		#print("player ", players.peek(), " owns ", players.peek().get_owned(board))
 		initial_counter += 1
 		if initial_counter < 42 or initial_counter in [59, 76, 93, 109]:
 			players.next()
@@ -382,7 +385,6 @@ func handle_adding(territory: Territory) -> void:
 	for player in players.get_all():
 		var player_id = player.get_id()
 		var troop_count = player.get_troops()
-		print("Player ID: %d has %d troops" % [player_id, troop_count])
 	
 	var player = players.peek()
 	if player.get_cards().size() >= 5:
@@ -414,7 +416,7 @@ func add_troop_to_territory(territory: Territory) -> bool:
 	
 	territory.increment_troops(1) # can add multiple at a time eventually to help with turns of huge amounts of troops
 	#players.peek().increment_troops(1)
-	print("player: ", players.peek().get_id(), " has ", players.peek().get_troops(), " troops")
+	#print("player: ", players.peek().get_id(), " has ", players.peek().get_troops(), " troops")
 	
 	
 	return true
@@ -506,7 +508,7 @@ func next_turn() -> void:
 	$TurnTimer.start(turn_time)
 	$Ui.update_tallies(players._players, players.peek())
 	change_game_state(GameState.ADDING_TROOPS)
-	troops_to_add = players.peek().count_bonus_troops($Board)
+	troops_to_add = players.peek().count_bonus_troops($Board) + calculate_continent_bonus(players.peek()) # this calculation should probably be in player.gd
 	$Ui.update_troop_count(troops_to_add)
 	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
 	print(troops_to_add)
@@ -524,3 +526,6 @@ func skip_stage() -> void:
 
 func _on_turn_timer_timeout():
 	next_turn()
+
+
+	

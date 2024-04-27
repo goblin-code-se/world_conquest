@@ -99,6 +99,6 @@ Rick!
 func player_controls_continent(player_id: int, continent_name: String):
 	var territories = continents[continent_name]
 	for territory in territories:
-		if territory.get_ownership() != player_id:
+		if territory.get_ownership().get_id() != player_id:
 			return false
 	return true

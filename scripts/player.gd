@@ -9,6 +9,8 @@ var _cards: Array
 var _conquered_one: bool = false
 var _initial_troop_hand: int
 var trade_sets = []
+var traded_cards = []
+var indices_to_remove = []
 
 func _init(id: int, initial_troops:int):
 	_id = id
@@ -93,18 +95,27 @@ func count_tradeable_sets() -> Array:
 		if not added:
 			card_indices['wild'].insert(0, used_cards[0]) # Return the wild card if not used
 	
+	print("the trade sets are: ", trade_sets)
 	return trade_sets
 
 
 
-func trading_set_used() -> void:
-	var indices_to_remove = []
+func trading_set_used(territory_cards: Array) -> void:
 	for trade_set in trade_sets:
 		indices_to_remove += trade_set
 	
 	indices_to_remove.sort_custom(sort_desc)
+	
 	for index in indices_to_remove:
+		print("the traded cards are: ", _cards[index])
+		territory_cards.append(_cards[index])
 		_cards.remove_at(index)
+	
+	territory_cards.shuffle()
+	traded_cards.clear()
+	
+	print("deck size after returning cards: ", territory_cards.size())
+
 
 func count_bonus_troops(board: Board) -> int:
 	return max(3, self.get_owned(board).size() / 3) + get_bonuses()

@@ -213,7 +213,7 @@ var mission_cards = [
 func draw_territory_card():
 	if territory_cards.size() == 0:
 		print("No more territory cards available")
-		return territory_cards.pop_front()
+		#return territory_cards.pop_front()
 	else:
 		var card = territory_cards.pop_front()
 		return card
@@ -239,14 +239,15 @@ func _on_move_button_pressed() -> void:
 
 
 func trade_cards(player):
-	var current_player = players.peek()
-	if current_player.can_trade():
+	#var current_player = players.peek()
+	if player.can_trade():
 		troops_awarded = calculate_card_bonus()
 		#current_player.increment_troops(troops_awarded)
 		card_trade_count += 1
 		#current_player.remove_traded_cards()
 		print("Player ", player.get_id(), " traded 1 set of cards for ", troops_awarded, " troops")
-		current_player.trading_set_used()
+		player.trading_set_used(territory_cards)
+		#player.reset_traded_cards()
 		troops_to_add += troops_awarded
 		$Ui.update_troop_count(troops_to_add)
 		print(already_traded)

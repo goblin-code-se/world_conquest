@@ -41,6 +41,7 @@ func update_tallies(players: Array[Player], current_player: Player):
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
+	POST_ATTACK,
 	ADDING_TROOPS,
 	ATTACK,
 	MOVING_FROM,
@@ -57,6 +58,8 @@ func update_game_state(state: GameState) -> void:
 		$MenuBar/Container/SkipTurnButton.visible = false
 		$MenuBar/Container/EndTurnButton.visible = false
 		return
+	#if state == GameState.POST_ATTACK:
+		#$MenuBar/Container/AttackButton.visible = true
 	if state != GameState.MOVING_FROM and state != GameState.MOVING_TO:
 		$MenuBar/Container/SkipTurnButton.visible = true
 		$MenuBar/Container/EndTurnButton.visible = false

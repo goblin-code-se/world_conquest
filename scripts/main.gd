@@ -19,9 +19,11 @@ var skip_lock := false
 var troops_awarded: int
 var already_traded: bool = false
 var board: Board
+var defender
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
+	POST_ATTACK,
 	ADDING_TROOPS,
 	ATTACK,
 	MOVING_FROM,
@@ -117,11 +119,14 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 		conquered_one = true
 		defender_territory.set_ownership(attacking_territory.get_ownership()) # this needs a method to get the conquered territory out of the owned territories of the attacked
 		defender.get_out_of_owned(defender_territory)
+		change_game_state(GameState.POST_ATTACK)
 		# not needed anymore, we don't keep track in player
 		#players.peek().add_territory(defender_territory)
-		attacking_territory.decrement_troops(attacker_dice_count)
-		defender_territory.increment_troops(attacker_dice_count)
-	
+		#attacking_territory.decrement_troops(attacker_dice_count)
+		#defender_territory.increment_troops(attacker_dice_count)
+		move(attacking_territory, defender_territory, attacker_dice_count)
+	else:
+		change_game_state(GameState.SELECT_ATTACKER)
 	#print(territory_cards.size())
 	if defender.get_troops() == 0:
 		#print("defender cards: ", defender.get_cards())
@@ -136,8 +141,8 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 		change_game_state(GameState.ADDING_TROOPS)
 		# $Ui.update_troop_count(troops_to_add)
 		$Ui.update_timer_hacky_donotuse(str(troops_to_add))
-	else:
-		change_game_state(GameState.SELECT_ATTACKER)
+	"else:
+		change_game_state(GameState.SELECT_ATTACKER)"
  
 
 func end_of_turn_draw_card(player):
@@ -287,6 +292,8 @@ func _on_board_territory_clicked(which: Territory) -> void:
 			handle_selecting_attacker(which)
 		GameState.SELECT_ATTACKED:
 			handle_select_attacked(which)
+		GameState.POST_ATTACK:
+			handle_moving_post_attack(which)
 		GameState.MOVING_FROM:
 			handle_moving_from(which)
 		GameState.MOVING_TO:
@@ -297,6 +304,19 @@ func _on_board_territory_clicked(which: Territory) -> void:
 					handle_initial_adding(which)
 			else:
 				handle_initial_adding(which)
+
+func handle_moving_post_attack(which: Territory):
+	moving_from = attacking_territory
+	moving_to = which
+	if which == defender_territory:
+		if moving_from.get_troop_number() > 1:
+			move(moving_from, moving_to, 1)
+		if moving_from.get_troop_number() == 1:
+			change_game_state(GameState.SELECT_ATTACKER)
+	else: 
+		print("Not the territory you just conquered. Please click on the correct territory: ", defender_territory.get_name())
+		change_game_state(GameState.POST_ATTACK)
+			
 
 
 func calculate_continent_bonus(player: Player):
@@ -343,8 +363,7 @@ func valid_move(moving_from: Territory, moving_to: Territory) -> bool:
 moves an amount of troops from one territory to the other
 """
 func move(from: Territory, to: Territory, amount: int) -> void:
-	# TODO: allow for multiple troops
-	from.increment_troops(-amount)
+	from.decrement_troops(amount)
 	to.increment_troops(amount)
 
 
@@ -447,12 +466,12 @@ func handle_select_attacked(which: Territory):
 	var adjacent: bool = which.get_id() in $Board.graph.get_adjacent_nodes(attacking_territory.get_id())
 	if adjacent and which.get_ownership() != players.peek(): #and which.get_ownership() != attacking_territory.get_ownership():
 		defender_territory = which
-		change_game_state(GameState.SELECT_ATTACKED)
+		#change_game_state(GameState.SELECT_ATTACKED)
 		print("defender: ", which.get_id())
 		attack(attacking_territory, defender_territory)
-		#change_game_state(GameState.SELECT_ATTACKER)
 	else:
 		print("can't attack")
+		change_game_state(GameState.SELECT_ATTACKER)
 
 """
 checks whether it is valid to move troops from a territory via:
@@ -522,6 +541,7 @@ func skip_stage() -> void:
 	var skip_to = {
 		GameState.SELECT_ATTACKER: GameState.MOVING_FROM,
 		GameState.SELECT_ATTACKED: GameState.MOVING_FROM,
+		GameState.POST_ATTACK: GameState.SELECT_ATTACKER,
 	}
 	if skip_to.get(state, null) != null:
 		change_game_state(skip_to[state])

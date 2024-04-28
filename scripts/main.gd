@@ -481,10 +481,13 @@ func handle_moving_to(which: Territory) -> void:
 	if which.get_ownership() == players.peek():
 		moving_to = which
 		if valid_move(moving_from, moving_to):
-			print("valid movement")
+			#print("valid movement")
 			move(moving_from, moving_to, 1)
-			# change_game_state(GameState.MOVING_FROM)
-			next_turn()
+			"Following could be changed to a better interaction in UI with the player."
+			if moving_from.get_troop_number() > 1:
+				handle_moving_to
+			else:
+				next_turn()
 		else:
 			print("not reachable")
 			change_game_state(GameState.MOVING_FROM)

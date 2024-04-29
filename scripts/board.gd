@@ -91,20 +91,19 @@ func draw_connections(graph: Graph) -> void:
 
 func _on_territory_clicked(which: Territory):
 	territory_clicked.emit(which)
-	
 
 """
 Rick!
 """
-func player_controls_continent(player_id: int, continent_name: String):
+func player_controls_continent(player: Player, continent_name: String):
 	var territories = continents[continent_name]
 	for territory in territories:
-		if territory.get_ownership().get_id() != player_id:
+		if territory.get_ownership() != player:
 			return false
 	return true
 
-func player_controls_third_continent(player_id: int, exceptions: Array) -> bool:
+func player_controls_third_continent(player: Player, exceptions: Array) -> bool:
 	for continent_name in continents.keys():
-		if continent_name not in exceptions and player_controls_continent(player_id, continent_name):
+		if continent_name not in exceptions and player_controls_continent(player, continent_name):
 			return true
 	return false

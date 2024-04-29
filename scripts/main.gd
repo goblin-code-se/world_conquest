@@ -21,7 +21,7 @@ var troops_awarded: int
 var already_traded: bool = false
 var board: Board
 var defender
-var random_opp: int
+var random_opp: Player
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -61,20 +61,20 @@ func _ready():
 	$Ui.trade_clicked.connect(func(): _on_trade_clicked())
 	
 	# Mission mode
-	if Mission_mode == true:
-		random_opp = randi() % players.get_all().size()
+	if Mission_mode:
+		random_opp = players.get_all().pick_random()
 		assign_mission_cards_to_players(players)
-		print("your opponent is: player ", random_opp)
+		print("your opponent is: player ", random_opp.get_id())
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	$Ui.update_timer($TurnTimer.get_time_left())
-	if state == GameState.INITIAL_STATE:
-		if Input.is_key_pressed(KEY_S) and not skip_lock:
-			skip_lock = true
-			for territory in $Board.graph.get_nodes():
-				if not territory.get_troop_number():
-					handle_initial_adding(territory)
+	if state == GameState.INITIAL_STATE and Input.is_key_pressed(KEY_S) \
+	 and not skip_lock:
+		skip_lock = true
+		for territory in $Board.graph.get_nodes():
+			if not territory.get_troop_number():
+				handle_initial_adding(territory)
 
 """Rick!"""
 
@@ -85,23 +85,21 @@ func _process(delta):
 func attack(attacking_territory: Territory, defender_territory: Territory):
 	var attacker_losses = 0
 	var defender_losses = 0
-	var attacker_dice_count = min(3, attacking_territory.get_troop_number() -1)
+	var attacker_dice_count = min(3, attacking_territory.get_troop_number() - 1)
 	var defender_dice_count = min(2, defender_territory.get_troop_number())
 	var defender = defender_territory.get_ownership()
-	var defender_id = defender.get_id()
 	var attacker = players.peek()
-	var attacker_id = attacker.get_id()
 	var attack_dice = []
-	print("the attacker is ", attacker_id)
-	print("the defender is ", defender_id)
+	print("the attacker is ", attacker.get_id())
+	print("the defender is ", defender.get_id())
 	for i in range(attacker_dice_count):
-		attack_dice.append(randi() % 6 +1)
+		attack_dice.append(randi_range(1, 6))
 	attack_dice.sort()
 	attack_dice.reverse()
 	
 	var defense_dice = []
 	for i in range(defender_dice_count):
-		defense_dice.append(randi() % 6 +1)
+		defense_dice.append(randi_range(1, 6))
 	defense_dice.sort()
 	defense_dice.reverse()
 	
@@ -110,7 +108,8 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 			defender_losses +=1
 		else:
 			attacker_losses +=1
-	
+	print("defender loses ", defender_losses)
+	print("attacker loses ", attacker_losses)
 	attacking_territory.decrement_troops(attacker_losses)
 	defender_territory.decrement_troops(defender_losses)
 	#defender.decrement_player_troops(defender_losses)
@@ -131,9 +130,9 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 	else:
 		change_game_state(GameState.SELECT_ATTACKER)
 	#print(territory_cards.size())
-	if defender.get_troops() == 0:
+	if not defender.get_troops():
 		#print("defender cards: ", defender.get_cards())
-		print(defender_id, " eliminated. Cards passing to", attacker)
+		print(defender.get_id(), " eliminated. Cards passing to", attacker)
 		#print("attacker cards: ", attacker.get_cards())
 		for card in defender.get_cards():
 			attacker.add_card(card)
@@ -149,7 +148,7 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
  
 
 func end_of_turn_draw_card(player):
-	if conquered_one == true:
+	if conquered_one:
 		var card = draw_territory_card()
 		player.add_card(card)
 		print("Player ", player.get_id(), " drew a card:", card.name)
@@ -220,7 +219,7 @@ var mission_cards = [
 ]
 
 func draw_territory_card():
-	if territory_cards.size() == 0:
+	if not territory_cards.size():
 		print("No more territory cards available")
 		#return territory_cards.pop_front()
 	else:
@@ -228,8 +227,7 @@ func draw_territory_card():
 		return card
 	
 func all_territories_owned():
-	if $Board.graph.all_territories_owned():
-		return true
+	return $Board.graph.all_territories_owned()
 
 
 # Only if mission game mode, lacks the signal.
@@ -324,7 +322,7 @@ func handle_moving_post_attack(which: Territory):
 func calculate_continent_bonus(player: Player):
 	var bonus = 0
 	for continent_name in continent_bonuses.keys():
-		if $Board.player_controls_continent(player.get_id(), continent_name):
+		if $Board.player_controls_continent(player, continent_name):
 			bonus += continent_bonuses[continent_name]
 			print("Player ", player.get_id()," controls the continent ", continent_name, " thus gets awarded ", bonus, " extra troops.")
 	return bonus
@@ -334,9 +332,9 @@ func check_mission_completion(player: Player) -> bool:
 	var mission = player.get_mission() 
 	match mission.description:
 		"Capture Europe, Australia and one other continent":
-			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "Australia") and $Board.player_controls_continent(player.get_id(), ["Europe", "Australia"])
+			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "Australia") and $Board.player_controls_continent(player, ["Europe", "Australia"])
 		"Capture Europe, South America and one other continent":
-			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "South America") and $Board.player_controls_continent(player.get_id(), ["Europe", "South America"])
+			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "South America") and $Board.player_controls_continent(player, ["Europe", "South America"])
 		"Capture North America and Africa":
 			return $Board.player_controls_continent(player.get_id(), "North America") and $Board.player_controls_continent(player.get_id(), "Africa")
 		"Capture Asia and South America":
@@ -346,7 +344,7 @@ func check_mission_completion(player: Player) -> bool:
 		"Capture 24 territories":
 			return player.get_owned_duplicated($Board).size() >= 24
 		"Destroy all armies of a named opponent (if yourself, capture 24 territories)":
-			if random_opp == player.get_id():
+			if random_opp == player:
 				return player.get_owned_duplicated($Board).size() >= 24
 			else:
 				return is_opp_eliminated(random_opp, $Board)
@@ -360,17 +358,14 @@ func check_mission_completion(player: Player) -> bool:
 		_:
 			return false
 
-func is_opp_eliminated(player_id: int, board: Board) -> bool:
-	for territory in board.graph.get_nodes():
-		if territory.get_ownership() and territory.get_ownership().get_id() == player_id:
-			return false
-	return true
-
+func is_opp_eliminated(player: Player, board: Board) -> bool:
+	return not player._troops
 
 func _on_trade_clicked():
-	if  already_traded == false:
+	if not already_traded:
 		trade_cards(players.peek())
-	else: print("already traded!")
+	else:
+		print("already traded!")
 
 """John!"""
 
@@ -381,7 +376,7 @@ checks if every node in the board belongs to one player id (game over)
 """
 
 func is_game_over():
-	if Mission_mode == false:
+	if not Mission_mode:
 		var graph = $Board.graph
 		var winner = graph.get_nodes()[0].get_ownership()
 		for node in graph.get_nodes():
@@ -430,12 +425,6 @@ func handle_initial_adding(territory: Territory) -> void:
 		change_game_state(GameState.ADDING_TROOPS)
 		next_turn()
 
-func board_check_no_unclaimed():
-	for node in $Board.graph.get_nodes():
-		if node.get_ownership() == null:
-			return false
-	return true
-
 """
 checks whether an adding click is valid via:
 	- same ownership as current player
@@ -455,7 +444,7 @@ func handle_adding(territory: Territory) -> void:
 	if add_troop_to_territory(territory):
 		troops_to_add -= 1
 		$Ui.update_troop_count(troops_to_add)
-	if troops_to_add == 0:
+	if not troops_to_add:
 		#trade_cards(players.peek())
 		already_traded = false
 		print("now already traded state is: ", already_traded)
@@ -464,7 +453,7 @@ func handle_adding(territory: Territory) -> void:
 
 func add_troop_to_territory(territory: Territory) -> bool:
 	# Player is not allowed to occupy this territory
-	if territory.get_ownership() != players.peek() and territory.get_ownership() != null:
+	if territory.get_ownership() not in [players.peek(), null]:
 		return false
 
 	# Player has no troops
@@ -478,11 +467,8 @@ func add_troop_to_territory(territory: Territory) -> bool:
 	territory.increment_troops(1) # can add multiple at a time eventually to help with turns of huge amounts of troops
 	#players.peek().increment_troops(1)
 	#print("player: ", players.peek().get_id(), " has ", players.peek().get_troops(), " troops")
-	
-	
 	return true
 
-		
 """
 checks whether it is possible to attack from a territory, valid if:
 	- it belongs to player clicking
@@ -522,7 +508,7 @@ checks whether it is valid to move troops from a territory via:
 if valid, changes state to MOVING TO
 """
 func handle_moving_from(which: Territory) -> void:
-	if which.get_ownership() == players.peek() and which.get_troop_number() > 1:
+	if which.get_ownership() == players.peek():
 		moving_from = which
 		change_game_state(GameState.MOVING_TO)
 	else:
@@ -545,9 +531,7 @@ func handle_moving_to(which: Territory) -> void:
 			#print("valid movement")
 			move(moving_from, moving_to, 1)
 			"Following could be changed to a better interaction in UI with the player."
-			if moving_from.get_troop_number() > 1:
-				handle_moving_to
-			else:
+			if moving_from.get_troop_number() == 1:
 				next_turn()
 		else:
 			print("not reachable")
@@ -560,8 +544,8 @@ func handle_moving_to(which: Territory) -> void:
 """
 func next_turn() -> void:
 	end_of_turn_draw_card(players.peek())
-	if is_game_over() != null:
-		return
+	if is_game_over():
+		return # should definitely present the winner at some point
 
 	# go to next player until current player has troops
 	# while loop is empty as all logic is in condition
@@ -587,7 +571,6 @@ func skip_stage() -> void:
 	}
 	if skip_to.get(state, null) != null:
 		change_game_state(skip_to[state])
-	pass
 
 func _on_turn_timer_timeout():
 	next_turn()

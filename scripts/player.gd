@@ -48,7 +48,7 @@ func increment_troops(i: int) -> void:
 	_troops += i
 
 func decrement_player_troops(i: int) -> void:
-	_troops -=i
+	_troops -= i
 
 """
 Card logic
@@ -58,10 +58,7 @@ func add_card(card):
 	_cards.append(card)
 
 func has_conquered() -> bool:
-	if _conquered_one == true:
-		return true # throughout heaven and earth, i alone am the conquered one
-	else:
-		return false
+	return _conquered_one
 
 func reset_conquest():
 	_conquered_one = false #reset at the end of each turn
@@ -70,10 +67,7 @@ func get_cards() -> Array:
 	return _cards
 
 func can_trade():
-	if count_tradeable_sets().size() > 0:
-		return true
-	else: return false
-
+	return count_tradeable_sets().size() > 0
 
 func count_tradeable_sets() -> Array:
 	var card_indices = {"infantry": [], "cavalry": [], "artillery": [], "wild": []}
@@ -171,8 +165,8 @@ func award_extra_troops_if_territory_owned(board: Board, traded_cards: Array) ->
 	
 	#print(territories_to_award)
 	
-	if territories_to_award.size() > 0:
-		var random_index = randi() % territories_to_award.size()
+	if territories_to_award.size():
+		var random_index = randi_range(0, territories_to_award.size() - 1)
 		var selected_territory = territories_to_award[random_index]
 		selected_territory.increment_troops(2)
 		print("Added 2 extra troops to ", selected_territory.get_name())

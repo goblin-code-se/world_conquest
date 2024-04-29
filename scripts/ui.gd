@@ -54,13 +54,13 @@ func update_game_state(state: GameState) -> void:
 	$MenuBar/Container/TroopCount.visible = state == GameState.ADDING_TROOPS
 	$MenuBar/Container/TradeButton.visible = state == GameState.ADDING_TROOPS
 	
-	if state == GameState.INITIAL_STATE or state == GameState.ADDING_TROOPS:
+	if state in [GameState.INITIAL_STATE, GameState.ADDING_TROOPS]:
 		$MenuBar/Container/SkipTurnButton.visible = false
 		$MenuBar/Container/EndTurnButton.visible = false
 		return
 	#if state == GameState.POST_ATTACK:
 		#$MenuBar/Container/AttackButton.visible = true
-	if state != GameState.MOVING_FROM and state != GameState.MOVING_TO:
+	if state not in [GameState.MOVING_FROM, GameState.MOVING_TO]:
 		$MenuBar/Container/SkipTurnButton.visible = true
 		$MenuBar/Container/EndTurnButton.visible = false
 	else:

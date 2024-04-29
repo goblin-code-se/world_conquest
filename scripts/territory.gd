@@ -30,7 +30,7 @@ func _process(delta):
 func update_info() -> void:
 	
 	var player_name;
-	if _owner == null:
+	if not _owner:
 		player_name = "Nobody"
 	else:
 		player_name = "Player {0}".format([_owner.get_id()])
@@ -68,7 +68,7 @@ func get_troop_number() -> int:
 	
 func update_sprite() -> void:
 	# no default case on match as who_owns should never not be in Player enum
-	if _owner == null:
+	if not _owner:
 		return
 	
 	match _owner.get_id():
@@ -104,13 +104,6 @@ func _on_mouse_exited():
 	
 
 func _on_input_event(viewport, event, shape_idx):
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if _hover:
+	if event is InputEventMouseButton and event.pressed and \
+	 event.button_index == MOUSE_BUTTON_LEFT and _hover:
 			territory_clicked.emit(self)
-
-
-func _on_hover_info_visibility_changed():
-	if _owner == null:
-		return
-		
-	#update_info()

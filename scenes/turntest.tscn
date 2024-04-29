@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c2hqgt8ssektr"]
 
-[ext_resource type="PackedScene" uid="uid://c67mjk5exq6xf" path="res://scenes/territory.tscn" id="2_5kaw4"]
+[ext_resource type="PackedScene" uid="uid://pwflgtmr2ak3" path="res://scenes/territory.tscn" id="2_5kaw4"]
 
 [sub_resource type="GDScript" id="GDScript_52oay"]
 script/source = "

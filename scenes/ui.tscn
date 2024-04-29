@@ -77,6 +77,13 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
 
+[node name="TradeButton" type="Button" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 16
+text = "Trade Cards"
+
 [node name="SkipTurnButton" type="Button" parent="MenuBar/Container"]
 custom_minimum_size = Vector2(180, 70)
 layout_mode = 2
@@ -108,10 +115,7 @@ grow_vertical = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
 
-[node name="TurnTimer" type="Timer" parent="."]
-
 [connection signal="pressed" from="MenuBar/Container/MoveButton" to="." method="_on_move_button_pressed"]
 [connection signal="pressed" from="MenuBar/Container/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="MenuBar/Container/SkipTurnButton" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="MenuBar/Container/EndTurnButton" to="." method="_on_button_pressed"]
-[connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

@@ -12,6 +12,7 @@ var trade_sets = []
 var traded_cards = []
 var indices_to_remove = []
 var owned: Array[Territory] = []
+var mission = null 
 #var territory_in_card_owned:bool = false
 
 func _init(id: int, initial_troops:int):
@@ -122,7 +123,11 @@ func trading_set_used(territory_cards: Array, board: Board) -> void:
 	for trade_set in trade_sets:
 		indices_to_remove += trade_set
 	
-	indices_to_remove.sort_custom(sort_desc)
+	
+	indices_to_remove.sort()
+	indices_to_remove.reverse()
+	
+	print("The indices to remove are: ", indices_to_remove)
 	
 	for index in indices_to_remove:
 		print("the traded cards are: ", _cards[index])
@@ -132,8 +137,11 @@ func trading_set_used(territory_cards: Array, board: Board) -> void:
 	
 	award_extra_troops_if_territory_owned(board, cards_to_check_ownership)
 	
+	indices_to_remove.clear()
 	territory_cards.shuffle()
 	traded_cards.clear()
+	print("at this moment, the traded_sets still are: ", trade_sets)
+	trade_sets.clear()
 	
 	print("deck size after returning cards: ", territory_cards.size())
 
@@ -168,3 +176,11 @@ func award_extra_troops_if_territory_owned(board: Board, traded_cards: Array) ->
 		var selected_territory = territories_to_award[random_index]
 		selected_territory.increment_troops(2)
 		print("Added 2 extra troops to ", selected_territory.get_name())
+
+
+func assign_mission(mission_card):
+	mission = mission_card
+	print("Mission assigned to player %d: %s" % [self.get_id(), mission.description])
+	
+func get_mission():
+	return mission

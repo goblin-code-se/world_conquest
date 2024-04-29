@@ -102,3 +102,9 @@ func player_controls_continent(player_id: int, continent_name: String):
 		if territory.get_ownership().get_id() != player_id:
 			return false
 	return true
+
+func player_controls_third_continent(player_id: int, exceptions: Array) -> bool:
+	for continent_name in continents.keys():
+		if continent_name not in exceptions and player_controls_continent(player_id, continent_name):
+			return true
+	return false

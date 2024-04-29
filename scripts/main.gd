@@ -8,7 +8,8 @@ var adjacent_territories
 var moving_from: Territory
 var moving_to: Territory
 var continent_bonuses: Dictionary
-var Mission_mode: bool
+"Mission mode NEEDS to receive a signal from the interface for mission mode to be activated.."
+var Mission_mode: bool = false
 var territory_cards = []
 var conquered_one: bool = false
 var card_trade_count = 0
@@ -20,6 +21,7 @@ var troops_awarded: int
 var already_traded: bool = false
 var board: Board
 var defender
+var random_opp: int
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -33,7 +35,6 @@ enum GameState {
 
 func _ready():
 	print("READY (main.gd)")
-
 	# Player initialization
 	var arr: Array[Player] = []
 	for i in range(1, 6):
@@ -61,7 +62,9 @@ func _ready():
 	
 	# Mission mode
 	if Mission_mode == true:
+		random_opp = randi() % players.get_all().size()
 		assign_mission_cards_to_players(players)
+		print("your opponent is: player ", random_opp)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -130,16 +133,16 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 	#print(territory_cards.size())
 	if defender.get_troops() == 0:
 		#print("defender cards: ", defender.get_cards())
-		#print(defender_id, " eliminated. Cards passing to", attacker)
+		print(defender_id, " eliminated. Cards passing to", attacker)
 		#print("attacker cards: ", attacker.get_cards())
 		for card in defender.get_cards():
 			attacker.add_card(card)
-		#print("attacker cards now: ", attacker.get_cards())
+		print("attacker cards now: ", attacker.get_cards())
 	if attacker.get_cards().size() >= 5:
 		print("You have accumulated 5 or more cards! You must trade now!")
 		$TurnTimer.start(turn_time)
 		change_game_state(GameState.ADDING_TROOPS)
-		# $Ui.update_troop_count(troops_to_add)
+		$Ui.update_troop_count(troops_to_add)
 		$Ui.update_timer_hacky_donotuse(str(troops_to_add))
 	"else:
 		change_game_state(GameState.SELECT_ATTACKER)"
@@ -232,9 +235,9 @@ func all_territories_owned():
 # Only if mission game mode, lacks the signal.
 func assign_mission_cards_to_players(players):
 	mission_cards.shuffle()
-	for player in players:
+	for player in players.get_all():
 		var mission = mission_cards.pop_front() 
-		player.assign_mission(mission)  # Lacks an assign mission function
+		player.assign_mission(mission) 
 
 
 func _on_attack_button_pressed() -> void:
@@ -245,7 +248,6 @@ func _on_move_button_pressed() -> void:
 
 
 func trade_cards(player):
-	#var current_player = players.peek()
 	if player.can_trade():
 		troops_awarded = calculate_card_bonus()
 		#current_player.increment_troops(troops_awarded)
@@ -328,6 +330,43 @@ func calculate_continent_bonus(player: Player):
 	return bonus
 	
 
+func check_mission_completion(player: Player) -> bool:
+	var mission = player.get_mission() 
+	match mission.description:
+		"Capture Europe, Australia and one other continent":
+			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "Australia") and $Board.player_controls_continent(player.get_id(), ["Europe", "Australia"])
+		"Capture Europe, South America and one other continent":
+			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "South America") and $Board.player_controls_continent(player.get_id(), ["Europe", "South America"])
+		"Capture North America and Africa":
+			return $Board.player_controls_continent(player.get_id(), "North America") and $Board.player_controls_continent(player.get_id(), "Africa")
+		"Capture Asia and South America":
+			return $Board.player_controls_continent(player.get_id(), "Asia") and $Board.player_controls_continent(player.get_id(), "South America")
+		"Capture North America and Australia":
+			return $Board.player_controls_continent(player.get_id(), "North America") and $Board.player_controls_continent(player.get_id(), "Australia")
+		"Capture 24 territories":
+			return player.get_owned_duplicated($Board).size() >= 24
+		"Destroy all armies of a named opponent (if yourself, capture 24 territories)":
+			if random_opp == player.get_id():
+				return player.get_owned_duplicated($Board).size() >= 24
+			else:
+				return is_opp_eliminated(random_opp, $Board)
+		"Capture 18 territories and occupy each with two troops":
+			var owned_territories = player.get_owned_duplicated($Board)
+			var qualified_territories_count = 0
+			for territory in owned_territories:
+				if territory.get_troop_number() >= 2:
+					qualified_territories_count += 1
+			return qualified_territories_count >= 18
+		_:
+			return false
+
+func is_opp_eliminated(player_id: int, board: Board) -> bool:
+	for territory in board.graph.get_nodes():
+		if territory.get_ownership() and territory.get_ownership().get_id() == player_id:
+			return false
+	return true
+
+
 func _on_trade_clicked():
 	if  already_traded == false:
 		trade_cards(players.peek())
@@ -342,12 +381,19 @@ checks if every node in the board belongs to one player id (game over)
 """
 
 func is_game_over():
-	var graph = $Board.graph
-	var winner = graph.get_nodes()[0].get_ownership()
-	for node in graph.get_nodes():
-		if node.get_ownership() != winner:
-			return null
-	return winner
+	if Mission_mode == false:
+		var graph = $Board.graph
+		var winner = graph.get_nodes()[0].get_ownership()
+		for node in graph.get_nodes():
+			if node.get_ownership() != winner:
+				return null
+		print("The winner is: ", winner.get_id())
+		return winner
+	else:
+		if check_mission_completion(players.peek()):
+			var winner = players.peek()
+			print("The winner is: ", winner.get_id())
+			return winner
 
 """
 returns whether or not a move to and from two territories is valid
@@ -401,10 +447,6 @@ if valid deducts 1 from player troop count, and adds 1 troop to territory that w
 """
 
 func handle_adding(territory: Territory) -> void:
-	for player in players.get_all():
-		var player_id = player.get_id()
-		var troop_count = player.get_troops()
-	
 	var player = players.peek()
 	if player.get_cards().size() >= 5:
 		print("You have accumulated 5 or more cards! You must trade now!")

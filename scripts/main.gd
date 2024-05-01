@@ -316,8 +316,6 @@ func handle_moving_post_attack(which: Territory):
 	else: 
 		print("Not the territory you just conquered. Please click on the correct territory: ", defender_territory.get_name())
 		change_game_state(GameState.POST_ATTACK)
-			
-
 
 func calculate_continent_bonus(player: Player):
 	var bonus = 0
@@ -574,6 +572,3 @@ func skip_stage() -> void:
 
 func _on_turn_timer_timeout():
 	next_turn()
-
-
-	

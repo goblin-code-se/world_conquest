@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dyr84av8mpvwn"]
+[gd_scene load_steps=5 format=3 uid="uid://dyr84av8mpvwn"]
 
 [ext_resource type="PackedScene" uid="uid://wjitd0lowq3q" path="res://scenes/board.tscn" id="1_3qqcc"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_mj1yr"]
 [ext_resource type="PackedScene" uid="uid://c6fbusm8pft11" path="res://scenes/ui.tscn" id="2_stmw1"]
+[ext_resource type="Script" path="res://scripts/ai.gd" id="4_k7n5n"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_mj1yr")
@@ -12,6 +13,9 @@ script = ExtResource("1_mj1yr")
 [node name="Ui" parent="." instance=ExtResource("2_stmw1")]
 
 [node name="TurnTimer" type="Timer" parent="."]
+
+[node name="Ai" type="Node" parent="."]
+script = ExtResource("4_k7n5n")
 
 [connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

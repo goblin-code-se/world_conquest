@@ -5,39 +5,72 @@ class_name Board
 
 const Territory = preload("res://scenes/territory.tscn")
 var graph: Graph
+var _editing := false
 var continents
+const line_tscn = preload("res://scenes/line.tscn")
 
 signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("READY (board.gd)")
-	continents = connect_and_get_continent_dict()
-	var selected: Area2D
+	var data = read_json()
+
+	init_territories(data["continents"])
+	
+	var staging_continents: Array[String] = []
+	for continent in $Continents.get_children():
+		staging_continents.append(continent.name)
+	continents = staging_continents
 	
 	# collect territories into Dictionary
 	# key: continent
 	# value: list of territories belonging to continent
 	var territories: Array[Territory] = []
-	for continent in continents.values():
-		territories.append_array(continent)
+	for continent in $Continents.get_children():
+		territories.append_array(continent.get_children())
 	graph = Graph.new(territories)
 	
-	"deleted duplicated [1,3 edge]. changed edge [2,4] to [6,4]"
-	# Disgustingly long list of edges, maybe port to text file?
-	var edges = [[0,1],[0,3],[1,3],[1,2],[1,4],[6,4],[2,5],[3,6],[3,4],[4,5],[4,7],[5,7],[6,7],[6,8],[7,8], # North America Edges
-	[9,10],[9,11],[10,11],[10,12],[11,12], # South America Edges
-	[13,14],[13,15],[13,16],[14,15],[15,16],[15,17],[15,18],[16,17],[17,18], # Africa Edges
-	[19,21],[19,20],[20,21],[20,23],[20,25],[21,23],[21,22],[22,23],[22,24],[23,24],[23,25],[24,25], # Europe Edges
-	[26,27],[26,32],[26,34],[27,28],[27,30],[27,31],[27,32],[28,29],[28,30],[29,30],[29,33],[29,31],[30,31],[31,33],[31,32],[32,35],[32,36],[34,32],[34,37],[34,35],[35,36],[37,35],  # Asia Edges
-	[38,39],[38,40],[39,41],[41,40], # Australia Edges
-	[2,19],[8,9],[0,29],[10,13],[25,13],[14,24],[14,37],[36,38],[22,26],[22,34],[22,37],[24,37],[15,37] # Intercontinental Edges
-	]
+	var edges = data["edges"]
 	graph.add_edges(edges)
-	# draw_connections(graph)
-	# populate(edges)
-	# game_loop()
+	print("READY (board.gd)")
 
+func read_json():
+	#if false:
+	if FileAccess.file_exists("user://board.json"):
+		print("reading user board")
+		var file = FileAccess.open("user://board.json", FileAccess.READ)
+		var content = file.get_as_text()
+		return JSON.parse_string(content)
+	else:
+		print("reading default board")
+		var file = FileAccess.open("res://assets/default_board.json", FileAccess.READ)
+		var content = file.get_as_text()
+		return JSON.parse_string(content)
 
+func write_json(json):
+	var content = JSON.stringify(json)
+	var file = FileAccess.open("user://board.json", FileAccess.WRITE)
+	file.store_string(content)
+
+func serialize_board() -> bool:
+	if not graph.all_territories_connected():
+		print("A territory is not connected. Cannot save.")
+		return false
+	# todo check if board is connected
+	var json_object = {}
+	json_object["edges"] = graph.get_edges()
+	json_object["continents"] = {}
+	
+	for continent in $Continents.get_children():
+		json_object["continents"][continent.name] = {}
+		json_object["continents"][continent.name]["territories"] = {}
+		for territory in continent.get_children():
+			json_object["continents"][continent.name]["territories"][territory.name] = {}
+			json_object["continents"][continent.name]["territories"][territory.name]["id"] = territory._graph_id
+			json_object["continents"][continent.name]["territories"][territory.name]["x"] = territory.position.x
+			json_object["continents"][continent.name]["territories"][territory.name]["y"] = territory.position.y
+
+	write_json(json_object)
+	return true
 """
 Loops over every territory doing 3 main things:
 	- adds key value pair of string continent name to list of territory nodes
@@ -45,18 +78,31 @@ Loops over every territory doing 3 main things:
 	- sets value of each territory node's continent to respective string
 	- connects every territories left click signal to _on_territory_clicked()
 """
-func connect_and_get_continent_dict() -> Dictionary:
-	var continents : Dictionary
-	var continent_name: String
-	for continent: Node in $Continents.get_children():
-		if continent not in continents.keys():
-			continent_name = continent.get_name()
-			continents[continent_name] = []
-		for territory: Area2D in continent.get_children():
-			continents[continent_name].append(territory)
-			territory.set_continent(continent_name)
-			territory.territory_clicked.connect(_on_territory_clicked)
-	return continents
+func init_territories(continents):
+	for continent in continents:
+		var cont_node = Node.new()
+		cont_node.name = continent
+		$Continents.add_child(cont_node)
+		for territory in continents[continent]["territories"]:
+			var territory_node = preload("res://scenes/territory.tscn").instantiate()
+			territory_node._graph_id = int(continents[continent]["territories"][territory]["id"])
+			territory_node.position = Vector2(int(continents[continent]["territories"][territory]["x"]), int(continents[continent]["territories"][territory]["y"]))
+			
+			territory_node.name = territory
+			cont_node.add_child(territory_node)
+			territory_node.update_info()
+			territory_node.territory_clicked.connect(_on_territory_clicked)
+
+	#var continents : Dictionary
+	#var continent_name: String
+	#for continent: Node in $Continents.get_children():
+		#if continent not in continents.keys():
+			#continent_name = continent.get_name()
+			#continents[continent_name] = []
+		#for territory: Area2D in continent.get_children():
+			#continents[continent_name].append(territory)
+			#territory.set_continent(continent_name)
+			#territory.territory_clicked.connect(_on_territory_clicked)
 
 """
 creates territory scene, adds to node tree, and sets position to Vector2 argument
@@ -70,7 +116,7 @@ func instantiate_territory(pos: Vector2) -> Territory:
 """
 creates Line2D node, adds to scene, sets points to 2 Vector2's given
 """
-func draw_line(from: Vector2, to: Vector2) -> Line2D:
+func draw_line(from: Vector2, to: Vector2):
 	var line = Line2D.new()
 	$Connections.add_child(line)
 	line.add_point(from)
@@ -78,16 +124,58 @@ func draw_line(from: Vector2, to: Vector2) -> Line2D:
 	line.get_parent().move_child(line, 0)
 	return line
 
+func draw_del(line, edge):
+	var from = line.get_point_position(0)
+	var to = line.get_point_position(1)
+	var button = Button.new()
+	button.text = "x"
+	button.position = ((from+to)/2.0) - Vector2(8.0, 15.0)
+	line.add_child(button)
+	button.pressed.connect(func(): 
+		delete_edge(edge)
+		clear_connections()
+		draw_connections()
+	)
+
+func delete_edge(edge):
+	graph._edges.remove_at(graph._edges.find(edge))
+	#clear_connections()
+	#draw_connections(graph)
+
+func add_edge(from: Territory, to: Territory):
+	# Check if edge is in graph edges
+	if graph.get_edges().find([from.get_id(), to.get_id()]) != -1:
+		return
+		
+	# Check if reversed edge is in graph edges
+	if graph.get_edges().find([to.get_id(), from.get_id()]) != -1:
+		return
+	
+	# Check if edge is circular	
+	if from.get_id() == to.get_id():
+		return
+	graph.add_edge(from.get_id(), to.get_id())
+	#clear_connections()
+	#draw_connections(graph)
+
 """
 loops through edge list of graph, drawing Line2D's under Connections Node from graph node to graph node
 """
-func draw_connections(graph: Graph) -> void:
+func draw_connections() -> void:
 	for edge in graph.get_edges():
-		if edge == [0,29]: #wrap around edge as to not kill our eyes
-			draw_line(graph.get_node(0).position,Vector2(0,125))
-			draw_line(graph.get_node(29).position, Vector2(2000,137))
+		if edge == [0,29] or edge == [29,0]: #wrap around edge as to not kill our eyes
+			draw_del(draw_line(graph.get_node(0).position,Vector2(0,125)), edge)
+			draw_del(draw_line(graph.get_node(29).position, Vector2(2000,137)), edge)
 			continue
-		draw_line(graph.get_node(edge[0]).position, graph.get_node(edge[1]).position)
+		draw_del(draw_line(graph.get_node(edge[0]).position, graph.get_node(edge[1]).position), edge)
+
+func clear_connections():
+	for child in $Connections.get_children():
+		child.queue_free()
+
+func register_territory_handlers(caller: Callable):
+	for node in graph.get_nodes():
+		node.pressed.connect(caller.bind(node))
 
 func _on_territory_clicked(which: Territory):
 	territory_clicked.emit(which)
@@ -96,7 +184,7 @@ func _on_territory_clicked(which: Territory):
 Rick!
 """
 func player_controls_continent(player: Player, continent_name: String):
-	var territories = continents[continent_name]
+	var territories = $Continents.get_node(continent_name).get_children()
 	for territory in territories:
 		if territory.get_ownership() != player:
 			return false

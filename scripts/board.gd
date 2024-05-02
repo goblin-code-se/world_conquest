@@ -183,14 +183,14 @@ func _on_territory_clicked(which: Territory):
 """
 Rick!
 """
-func player_controls_continent(player: Player, continent_name: String):
+func player_controls_continent(player, continent_name: String):
 	var territories = $Continents.get_node(continent_name).get_children()
 	for territory in territories:
 		if territory.get_ownership() != player:
 			return false
 	return true
 
-func player_controls_third_continent(player: Player, exceptions: Array) -> bool:
+func player_controls_third_continent(player, exceptions: Array) -> bool:
 	for continent_name in continents.keys():
 		if continent_name not in exceptions and player_controls_continent(player, continent_name):
 			return true

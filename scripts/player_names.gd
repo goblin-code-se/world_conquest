@@ -19,6 +19,8 @@ func _ready():
 			players[i]["ai"] = is_ai
 			
 			var difficulty = node.get_node("OptionButton").get_selected_id()
+			var diff_percent = [0.4, 0.5, 0.7][difficulty]
+
 			players[i]["ai_difficulty"] = difficulty
 			
 		redis.data["players"] = players

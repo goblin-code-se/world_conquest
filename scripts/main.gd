@@ -23,7 +23,7 @@ var troops_awarded: int
 var already_traded: bool = false
 var board: Board
 var defender
-var random_opp: Player
+var random_opp
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -38,16 +38,26 @@ enum GameState {
 var redis = preload("res://redis.tres")
 
 func _ready():
+	board = $Board
 	print("READY (main.gd)")
 	print(redis.data)
-	Mission_mode = redis.data["mission_mode"]
+	mission_mode = redis.data["mission_mode"]
 	# Player initialization
 	var arr = []
 	for i in range(1, 6):
-		var player = Player.new(i, 25)
+		var is_ai = redis.data["players"][i]["ai"]
+		
+		var player
+		if is_ai:
+			var difficulty = redis.data["players"][i]["ai_difficulty"]
+			player = Ai.new(i, 25, difficulty, self)
+		else:
+			player = Player.new(i, 25)
 		player._name = redis.data["players"][i]["name"]
 		arr.append(player)
+		
 	players = TurnTracker.new(arr)
+
 
 	# Card init
 	setup_territory_cards()
@@ -89,6 +99,9 @@ func _process(delta):
 		redis.data["winner"] = players.peek()
 		get_tree().change_scene_to_file("res://scenes/win.tscn")
 	
+	# Arrow silly rendering
+	if players.peek() is Ai:
+		return
 	var draw_arrow_states = [GameState.SELECT_ATTACKED, GameState.MOVING_TO, GameState.POST_ATTACK]
 	$MoveLine.visible = state in draw_arrow_states
 	if state in draw_arrow_states:
@@ -349,7 +362,7 @@ func handle_moving_post_attack(which: Territory):
 		print("Not the territory you just conquered. Please click on the correct territory: ", defender_territory.get_name())
 		change_game_state(GameState.POST_ATTACK)
 
-func calculate_continent_bonus(player: Player):
+func calculate_continent_bonus(player):
 	var bonus = 0
 	for continent_name in continent_bonuses.keys():
 		if $Board.player_controls_continent(player, continent_name):
@@ -358,7 +371,7 @@ func calculate_continent_bonus(player: Player):
 	return bonus
 	
 
-func check_mission_completion(player: Player) -> bool:
+func check_mission_completion(player) -> bool:
 	var mission = player.get_mission() 
 	match mission.description:
 		"Capture Europe, Australia and one other continent":
@@ -388,7 +401,7 @@ func check_mission_completion(player: Player) -> bool:
 		_:
 			return false
 
-func is_opp_eliminated(player: Player, board: Board) -> bool:
+func is_opp_eliminated(player, board: Board) -> bool:
 	return not player._troops
 
 func _on_trade_clicked():
@@ -439,12 +452,16 @@ func move(from: Territory, to: Territory, amount: int) -> void:
 
 
 func handle_initial_adding(territory: Territory) -> void:
-	if add_troop_to_territory(territory):
+	if territory.owner == null:
+		add_troop_to_territory(territory)
 		#print("player ", players.peek(), " owns ", players.peek().get_owned(board))
 		initial_counter += 1
 		if initial_counter < 42 or initial_counter in [59, 76, 93, 109]:
-			players.next()
+			next_turn()
 			$Ui.update_tallies(players._players, players.peek())
+		else:
+			if players.peek() is Ai:
+				players.peek().initial_adding(board)
 	
 	$Ui.update_timer_hacky_donotuse(str(initial_counter))
 
@@ -579,19 +596,34 @@ func next_turn() -> void:
 		redis.data["winner"] = winner
 		get_tree().change_scene_to_file("res://scenes/win.tscn")
 
-	# go to next player until current player has troops
-	# while loop is empty as all logic is in condition
-	#print(players.next().get_troops())
-	while not players.next().get_troops():
-		pass
+	if state != GameState.INITIAL_STATE:
+		# go to next player until current player has troops
+		# while loop is empty as all logic is in condition
+		#print(players.next().get_troops())
+		while not players.next().get_troops():
+			pass
 	
 	$TurnTimer.start(turn_time)
 	$Ui.update_tallies(players._players, players.peek())
-	change_game_state(GameState.ADDING_TROOPS)
+	if state != GameState.INITIAL_STATE:
+		change_game_state(GameState.ADDING_TROOPS)
 	troops_to_add = players.peek().count_bonus_troops($Board) + calculate_continent_bonus(players.peek()) # this calculation should probably be in player.gd
 	$Ui.update_troop_count(troops_to_add)
 	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
-	print(troops_to_add)
+
+	var player = players.next()
+	if player is Ai:
+		match state:
+			GameState.ADDING_TROOPS:
+				player.place_troops(board, troops_to_add)
+			GameState.SELECT_ATTACKER:
+				player.attack(board)
+			GameState.POST_ATTACK:
+				player.move_post_attack(board, attacking_territory, defender_territory)
+			GameState.MOVING_FROM:
+				player.move(board)
+			GameState.INITIAL_STATE:
+				player.initial_adding(board)
 
 func skip_stage() -> void:
 	print("Skipping?")

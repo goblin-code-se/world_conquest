@@ -11,7 +11,7 @@ var moving_from: Territory
 var moving_to: Territory
 var continent_bonuses: Dictionary
 "Mission mode NEEDS to receive a signal from the interface for mission mode to be activated.."
-var Mission_mode: bool = false
+var mission_mode: bool = false
 var territory_cards = []
 var conquered_one: bool = false
 var card_trade_count = 0
@@ -64,7 +64,7 @@ func _ready():
 	$Board.register_territory_handlers(draw_arrow)
 	
 	# Mission mode
-	if Mission_mode:
+	if mission_mode:
 		random_opp = players.get_all().pick_random()
 		assign_mission_cards_to_players(players)
 		print("your opponent is: player ", random_opp.get_id())
@@ -338,8 +338,6 @@ func handle_moving_post_attack(which: Territory):
 	else: 
 		print("Not the territory you just conquered. Please click on the correct territory: ", defender_territory.get_name())
 		change_game_state(GameState.POST_ATTACK)
-			
-
 
 func calculate_continent_bonus(player: Player):
 	var bonus = 0
@@ -398,7 +396,7 @@ checks if every node in the board belongs to one player id (game over)
 """
 
 func is_game_over():
-	if not Mission_mode:
+	if not mission_mode:
 		var graph = $Board.graph
 		var winner = graph.get_nodes()[0].get_ownership()
 		for node in graph.get_nodes():
@@ -596,6 +594,3 @@ func skip_stage() -> void:
 
 func _on_turn_timer_timeout():
 	next_turn()
-
-
-	

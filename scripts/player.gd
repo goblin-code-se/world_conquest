@@ -5,6 +5,7 @@ class_name Player
 
 var _id: int
 var _troops: int
+var _name: String
 var _cards: Array
 var _conquered_one: bool = false
 var _initial_troop_hand: int

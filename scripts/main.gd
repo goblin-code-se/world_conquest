@@ -40,9 +40,11 @@ func _ready():
 	print(redis.data)
 	Mission_mode = redis.data["mission_mode"]
 	# Player initialization
-	var arr: Array[Player] = []
+	var arr = []
 	for i in range(1, 6):
-		arr.append(Player.new(i, 25))
+		var player = Player.new(i, 25)
+		player._name = redis.data["players"][i]["name"]
+		arr.append(player)
 	players = TurnTracker.new(arr)
 
 	# Card init
@@ -70,6 +72,7 @@ func _ready():
 		assign_mission_cards_to_players(players)
 		print("your opponent is: player ", random_opp.get_id())
 
+	$Ui.update_tallies(players._players, players.peek())
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	$Ui.update_timer($TurnTimer.get_time_left())
@@ -79,6 +82,9 @@ func _process(delta):
 		for territory in $Board.graph.get_nodes():
 			if not territory.get_troop_number():
 				handle_initial_adding(territory)
+	if Input.is_key_pressed(KEY_W):
+		redis.data["winner"] = players.peek()
+		get_tree().change_scene_to_file("res://scenes/win.tscn")
 
 """Rick!"""
 
@@ -548,8 +554,10 @@ func handle_moving_to(which: Territory) -> void:
 """
 func next_turn() -> void:
 	end_of_turn_draw_card(players.peek())
-	if is_game_over():
-		return # should definitely present the winner at some point
+	var winner = is_game_over()
+	if winner:
+		redis.data["winner"] = winner
+		get_tree().change_scene_to_file("res://scenes/win.tscn")
 
 	# go to next player until current player has troops
 	# while loop is empty as all logic is in condition

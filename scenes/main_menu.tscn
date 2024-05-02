@@ -75,10 +75,12 @@ size_flags_horizontal = 3
 text = "Board Editor"
 
 [node name="Spacer" type="Control" parent="Centerer/MenuButtons/HBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(10, 2.08165e-12)
 layout_mode = 2
 
 [node name="Options" type="Button" parent="Centerer/MenuButtons/HBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Options

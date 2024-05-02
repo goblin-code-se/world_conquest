@@ -29,12 +29,12 @@ func update_troop_count(count: int):
 func update_timer_hacky_donotuse(text: String):
 	$MenuBar/Container/TurnCountdown.text = text
 
-func update_tallies(players: Array[Player], current_player: Player):
+func update_tallies(players, current_player):
 	var text = ""
 	for player in players:
-		text += "P{num} ".format({"num":player._id})
+		text += "{name} ".format({"name":player._name})
 		if player._id == current_player._id:
-			text += " <--"
+			text += " ⬅️"
 		text += "\n"
 	$Tallies.text = text
 

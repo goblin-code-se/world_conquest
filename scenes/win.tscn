@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://y6rxep22dnr6"]
+[gd_scene load_steps=2 format=3 uid="uid://y6rxep22dnr6"]
+
+[ext_resource type="Script" path="res://scenes/win.gd" id="1_jc7yi"]
 
 [node name="Win" type="Control"]
 layout_mode = 3
@@ -9,6 +11,7 @@ offset_left = -1.0
 offset_right = -1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_jc7yi")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -34,5 +37,6 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_font_sizes/bold_font_size = 73
 bbcode_enabled = true
-text = "[wave][b][u]PLAYER X WINS[/u][/b][/wave]"
+text = "[wave][b][u]PLAYER LONGNAMELONGNAME WINS[/u][/b][/wave]"
 fit_content = true
+autowrap_mode = 0

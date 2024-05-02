@@ -1,7 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://c6fbusm8pft11"]
+[gd_scene load_steps=8 format=3 uid="uid://c6fbusm8pft11"]
 
 [ext_resource type="Script" path="res://scripts/ui.gd" id="1_un0fq"]
 [ext_resource type="Texture2D" uid="uid://c38orgkaclkmq" path="res://assets/white1x1.png" id="3_mto2d"]
+[ext_resource type="Texture2D" uid="uid://bixcwpiwomdf0" path="res://assets/factions/blue faction.png" id="3_qchkv"]
+[ext_resource type="Texture2D" uid="uid://4dckso23v1mf" path="res://assets/factions/black faction.png" id="4_3uy33"]
+[ext_resource type="Texture2D" uid="uid://p3gtb0gp7lo2" path="res://assets/factions/orange faction.png" id="5_5o7gm"]
+[ext_resource type="Texture2D" uid="uid://ct3848mjg3pi5" path="res://assets/factions/purple faction.png" id="6_uogh2"]
+[ext_resource type="Texture2D" uid="uid://cuy746gfnqt38" path="res://assets/factions/yellow faction.png" id="7_kan7x"]
 
 [node name="CanvasLayer" type="CanvasLayer"]
 script = ExtResource("1_un0fq")
@@ -107,13 +112,58 @@ anchors_preset = -1
 anchor_top = 0.763
 anchor_right = 0.021
 anchor_bottom = 0.805
-offset_left = 1.0
-offset_top = -77.04
-offset_right = 0.679997
+offset_left = 57.0
+offset_top = -269.04
+offset_right = 56.68
 offset_bottom = -77.4001
 grow_vertical = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
+text = "1
+2
+3
+4
+5"
+
+[node name="TextureRect" type="TextureRect" parent="Tallies"]
+offset_left = -51.0
+offset_top = 2.00012
+offset_right = -9.0
+offset_bottom = 46.0001
+texture = ExtResource("3_qchkv")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="Tallies"]
+offset_left = -49.0
+offset_top = 55.0001
+offset_right = -10.0
+offset_bottom = 92.0001
+texture = ExtResource("4_3uy33")
+expand_mode = 1
+
+[node name="TextureRect3" type="TextureRect" parent="Tallies"]
+offset_left = -47.0
+offset_top = 102.0
+offset_right = -8.0
+offset_bottom = 139.0
+texture = ExtResource("5_5o7gm")
+expand_mode = 1
+
+[node name="TextureRect4" type="TextureRect" parent="Tallies"]
+offset_left = -47.0
+offset_top = 147.0
+offset_right = -8.0
+offset_bottom = 184.0
+texture = ExtResource("6_uogh2")
+expand_mode = 1
+
+[node name="TextureRect5" type="TextureRect" parent="Tallies"]
+offset_left = -45.0
+offset_top = 198.0
+offset_right = -6.0
+offset_bottom = 235.0
+texture = ExtResource("7_kan7x")
+expand_mode = 1
 
 [connection signal="pressed" from="MenuBar/Container/MoveButton" to="." method="_on_move_button_pressed"]
 [connection signal="pressed" from="MenuBar/Container/AttackButton" to="." method="_on_attack_button_pressed"]

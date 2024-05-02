@@ -17,5 +17,11 @@ script = ExtResource("1_mj1yr")
 [node name="Ai" type="Node" parent="."]
 script = ExtResource("4_k7n5n")
 
+[node name="MoveLine" type="Line2D" parent="."]
+visible = false
+z_index = 1
+points = PackedVector2Array(0, 0, 100, 100)
+default_color = Color(0, 1, 0, 1)
+
 [connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

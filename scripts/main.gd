@@ -2,6 +2,8 @@ extends Node
 
 const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to properly start at 5:00 and not 4:59
 var state: GameState
+var _connecting := false
+var _connecting_from
 var attacking_territory
 var defender_territory
 var adjacent_territories
@@ -59,6 +61,7 @@ func _ready():
 	$Ui.end_turn_clicked.connect(next_turn)
 	$Ui.skip_stage_clicked.connect(skip_stage)
 	$Ui.trade_clicked.connect(func(): _on_trade_clicked())
+	$Board.register_territory_handlers(draw_arrow)
 	
 	# Mission mode
 	if mission_mode:
@@ -75,6 +78,25 @@ func _process(delta):
 		for territory in $Board.graph.get_nodes():
 			if not territory.get_troop_number():
 				handle_initial_adding(territory)
+	
+	var draw_arrow_states = [GameState.SELECT_ATTACKED, GameState.MOVING_TO, GameState.POST_ATTACK]
+	$MoveLine.visible = state in draw_arrow_states
+	if state in draw_arrow_states:
+		var mouse_pos = get_viewport().get_mouse_position()
+		var from_territory
+		if state == GameState.SELECT_ATTACKED:
+			from_territory = attacking_territory
+			$MoveLine.default_color = Color.RED
+		elif state == GameState.MOVING_TO or state == GameState.POST_ATTACK:
+			from_territory = moving_from
+			$MoveLine.default_color = Color.BLUE
+		$MoveLine.clear_points()
+		$MoveLine.add_point(attacking_territory.position)
+		$MoveLine.add_point(mouse_pos)
+
+func draw_arrow(node):
+	pass
+
 
 """Rick!"""
 

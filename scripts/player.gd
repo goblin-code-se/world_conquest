@@ -158,7 +158,6 @@ func award_extra_troops_if_territory_owned(board: Board, traded_cards: Array) ->
 	
 	print(owned_territories)
 	
-	
 	for card in traded_cards:
 		for territory in owned_territories:
 			if territory.get_name() == card["name"]:

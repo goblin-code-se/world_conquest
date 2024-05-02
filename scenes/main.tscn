@@ -25,5 +25,12 @@ default_color = Color(0, 1, 0, 1)
 
 [node name="AiTimer" type="Timer" parent="."]
 
+[node name="Broadcast" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Broadcasts"
+
+[node name="BroadcastTimer" type="Timer" parent="."]
+
 [connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

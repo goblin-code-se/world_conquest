@@ -10,13 +10,15 @@ var trade_sets = []
 var traded_cards = []
 var indices_to_remove = []
 var owned: Array[Territory] = []
-var mission = null 
+var mission = null
+var _difficulty: float
 #var territory_in_card_owned:bool = false
 
-func _init(id: int, initial_troops:int):
+func _init(id: int, initial_troops:int, difficulty: float):
 	_id = id
 	_cards = []
 	_initial_troop_hand = initial_troops
+	_difficulty = difficulty
 	
 func get_owned(board: Board) -> Array[Territory]:
 	return board.graph.get_nodes().filter(func(territory: Territory): territory.get_ownership() == self)
@@ -171,6 +173,23 @@ func get_mission():
 	return mission
 
 func move(board: Board) -> void:
+	if randf() < _difficulty:
+		var territories_with_extra_troops = []
+		for territory in get_owned_duplicated(board):
+			if territory.get_troop_number() > 1:
+				territories_with_extra_troops.append(territory)
+		var to_move_from = territories_with_extra_troops.pick_random()
+		var troops_to_move = randi_range(1, to_move_from.get_troop_number() - 1)
+		var to_move_to = get_owned_duplicated(board).pick_random()
+
+		get_parent().handle_moving_from(to_move_from)
+		get_parent().handle_moving_to(to_move_to)
+		
+		if randf() < _difficulty:
+			get_parent().skip_stage()
+
+		return
+
 	var most_dangerous_position: Territory
 	var highest_danger_level: int
 	for territory: Territory in get_owned(board):
@@ -205,6 +224,11 @@ func move(board: Board) -> void:
 
 func place_troops(board: Board):
 	while get_parent().troops_to_add:
+		
+		if randf() < _difficulty:
+			get_parent().handle_moving_from(get_owned_duplicated(board).pick_random())
+			continue
+		
 		var most_dangerous_position: Territory
 		var highest_danger_level: int
 		for territory: Territory in get_owned(board):
@@ -236,26 +260,75 @@ func initial_adding(board: Board):
 				adjacent_to_enemies.append(node)
 
 	if not free_nodes:
-		get_parent().handle_initial_adding(adjacent_to_enemies.pick_random())
+		if randf() < _difficulty:
+			get_parent().handle_initial_adding(get_owned_duplicated(board).pick_random())
+		else:
+			var most_endangered_territories = []
+			var highest_danger_level = null
+			for node in adjacent_to_enemies:
+				var danger_level = -node.get_troop_number()
+				for neighbour in board.graph.get_adjacent_nodes(node.get_id()):
+					if board.graph.get_node(neighbour).get_ownership() != self:
+						danger_level += board.graph.get_node(neighbour).get_troop_number()
+				if danger_level == highest_danger_level:
+					most_endangered_territories.append(node)
+				elif danger_level > highest_danger_level:
+					highest_danger_level = danger_level
+					most_endangered_territories = [node]
+
+			get_parent().handle_initial_adding(most_endangered_territories.pick_random())
 		return
 
-	var most_endangered_territories = []
-	var highest_danger_level = null
-	for node in adjacent_to_enemies:
-		var danger_level = -node.get_troop_number()
-		for neighbour in board.graph.get_adjacent_nodes(node.get_id()):
-			if board.graph.get_node(neighbour).get_ownership() != self:
-				danger_level += board.graph.get_node(neighbour).get_troop_number()
-		if danger_level == highest_danger_level:
-			most_endangered_territories.append(node)
-		elif danger_level > highest_danger_level:
-			highest_danger_level = danger_level
-			most_endangered_territories = [node]
+	if randi() < _difficulty:
+		get_parent().handle_initial_adding(free_nodes.pick_random())
+		return
+	
+	var adjacent_to_allies = []
+	var continents = []
+	var in_owned_continent = []
+	var both = []
+	for node in free_nodes:
+		continents.append(node._continent)
 
-	get_parent().handle_initial_adding(most_endangered_territories.pick_random())
+	for node in free_nodes:
+		for neighbour_id in board.graph.get_adjacent_nodes(node.get_id()):
+			var neighbour = board.graph.get_node(neighbour_id)
+			if neighbour.get_ownership() == self:
+				adjacent_to_allies.append(neighbour)
+			if neighbour._continent in continents:
+				in_owned_continent.append(neighbour)
+			if neighbour in in_owned_continent and neighbour in adjacent_to_allies:
+				both.append(neighbour)
+	
+	if both:
+		get_parent().handle_initial_adding(both.pick_random())
+	elif in_owned_continent:
+		get_parent().handle_initial_adding(in_owned_continent.pick_random())
+	elif adjacent_to_allies:
+		get_parent().handle_initial_adding(adjacent_to_allies.pick_random())
+	else:
+		get_parent().handle_initial_adding(get_owned_duplicated(board).pick_random())
 
 func attack(board: Board):
 	var free_troops = []
+	
+	if randi() < _difficulty:
+		for node in get_owned_duplicated(board):
+			if node.get_troop_number() > 1:
+				for neighbour_id in board.graph.get_adjacent_nodes(node.get_id()):
+					if board.graph.get_node(neighbour_id).get_ownership() != self:
+						free_troops.append(node)
+						break
+
+		var attacker = free_troops.pick_random()
+		var adjacent_enemies = []
+		for node_id in board.graph.get_adjacent_nodes(attacker):
+			if board.graph.get_node(node_id).get_ownership() != self:
+				adjacent_enemies.append(board.graph.get_node(node_id))
+		var attacked = adjacent_enemies.pick_random()
+		get_parent().handle_selecting_attacker(attacker)
+		get_parent().handle_select_attacked(attacked)
+		return
 
 	for node in get_owned_duplicated(board):
 		var adjacent_troops = 0
@@ -289,6 +362,9 @@ func attack(board: Board):
 	get_parent().handle_select_attacked(attacked)
 
 func move_post_attack(board: Board, attacker: Territory, attacked: Territory):
+	if randi() < _difficulty:
+		get_parent().handle_moving_post_attack(attacked)
+	
 	for neighbour in board.graph.get_adjacent_nodes(attacker.get_id()):
 		if board.graph.get_node(neighbour).get_ownership() != attacker.get_ownership():
 			get_parent().skip_stage()

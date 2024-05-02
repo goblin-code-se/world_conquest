@@ -38,6 +38,7 @@ var redis = preload("res://redis.tres")
 func _ready():
 	print("READY (main.gd)")
 	print(redis.data)
+	Mission_mode = redis.data["mission_mode"]
 	# Player initialization
 	var arr: Array[Player] = []
 	for i in range(1, 6):

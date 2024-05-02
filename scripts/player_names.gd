@@ -22,7 +22,6 @@ func _ready():
 			players[i]["ai_difficulty"] = difficulty
 			
 		redis.data["players"] = players
-		redis.data["mission_mode"] = true
 		print(redis.data)
 		get_tree().change_scene_to_file("res://scenes/main.tscn")
 	)

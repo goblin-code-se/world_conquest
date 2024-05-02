@@ -1,0 +1,55 @@
+[gd_scene load_steps=3 format=3 uid="uid://bjvf2sjhtlff2"]
+
+[ext_resource type="Theme" uid="uid://cmnpc1gvwfmpt" path="res://new_theme.tres" id="1_kn1k3"]
+[ext_resource type="PackedScene" uid="uid://cychvnja24fu2" path="res://scenes/player_names_individual.tscn" id="2_fmbx8"]
+
+[node name="PlayerNames" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.00392157, 0.0745098, 0.419608)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -960.0
+offset_bottom = -540.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+theme = ExtResource("1_kn1k3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+layout_mode = 2
+
+[node name="HBoxContainer2" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+layout_mode = 2
+
+[node name="HBoxContainer3" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+layout_mode = 2
+
+[node name="HBoxContainer4" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+layout_mode = 2
+
+[node name="HBoxContainer5" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "START GAME"

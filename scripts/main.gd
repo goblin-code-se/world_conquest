@@ -1,5 +1,6 @@
 extends Node
 
+const ai_sleep_time = 0.2
 const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to properly start at 5:00 and not 4:59
 var state: GameState
 var _connecting := false
@@ -24,6 +25,7 @@ var already_traded: bool = false
 var board: Board
 var defender
 var random_opp
+var scene_tree
 enum GameState {
 	SELECT_ATTACKER,
 	SELECT_ATTACKED,
@@ -35,9 +37,13 @@ enum GameState {
 	INITIAL_STATE,
 }
 
+signal change_turn
+signal start_ai_turn
+
 var redis = preload("res://redis.tres")
 
 func _ready():
+	scene_tree = get_tree()
 	board = $Board
 	print("READY (main.gd)")
 	print(redis.data)
@@ -57,8 +63,9 @@ func _ready():
 		arr.append(player)
 		
 	players = TurnTracker.new(arr)
-
-
+	change_turn.connect(next_turn, CONNECT_DEFERRED)
+	$AiTimer.timeout.connect(play_ai, CONNECT_DEFERRED)	
+	
 	# Card init
 	setup_territory_cards()
 	#print(territory_cards.size())
@@ -86,6 +93,12 @@ func _ready():
 		print("your opponent is: player ", random_opp.get_id())
 
 	$Ui.update_tallies(players._players, players.peek())
+	
+	var player = players.peek()
+	if players.peek() is Ai:
+		$AiTimer.start(ai_sleep_time)
+		#start_ai_turn.emit(players.peek())
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	$Ui.update_timer($TurnTimer.get_time_left())
@@ -97,7 +110,7 @@ func _process(delta):
 				handle_initial_adding(territory)
 	if Input.is_key_pressed(KEY_W):
 		redis.data["winner"] = players.peek()
-		get_tree().change_scene_to_file("res://scenes/win.tscn")
+		scene_tree.change_scene_to_file("res://scenes/win.tscn")
 	
 	# Arrow silly rendering
 	if players.peek() is Ai:
@@ -114,8 +127,9 @@ func _process(delta):
 			from_territory = moving_from
 			$MoveLine.default_color = Color.BLUE
 		$MoveLine.clear_points()
-		$MoveLine.add_point(attacking_territory.position)
-		$MoveLine.add_point(mouse_pos)
+		if from_territory != null:
+			$MoveLine.add_point(from_territory.position)
+			$MoveLine.add_point(mouse_pos)
 
 func draw_arrow(node):
 	pass
@@ -348,7 +362,10 @@ func _on_board_territory_clicked(which: Territory) -> void:
 				while which.get_ownership() == players.peek():
 					handle_initial_adding(which)
 			else:
-				handle_initial_adding(which)
+				if players.peek() is Ai:
+					players.peek().initial_adding(board)
+				else:
+					handle_initial_adding(which)
 
 func handle_moving_post_attack(which: Territory):
 	moving_from = attacking_territory
@@ -375,15 +392,15 @@ func check_mission_completion(player) -> bool:
 	var mission = player.get_mission() 
 	match mission.description:
 		"Capture Europe, Australia and one other continent":
-			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "Australia") and $Board.player_controls_continent(player, ["Europe", "Australia"])
+			return $Board.player_controls_continent(player, "Europe") and $Board.player_controls_continent(player, "Australia")
 		"Capture Europe, South America and one other continent":
-			return $Board.player_controls_continent(player.get_id(), "Europe") and $Board.player_controls_continent(player.get_id(), "South America") and $Board.player_controls_continent(player, ["Europe", "South America"])
+			return $Board.player_controls_continent(player, "Europe") and $Board.player_controls_continent(player, "South America")
 		"Capture North America and Africa":
-			return $Board.player_controls_continent(player.get_id(), "North America") and $Board.player_controls_continent(player.get_id(), "Africa")
+			return $Board.player_controls_continent(player, "North America") and $Board.player_controls_continent(player, "Africa")
 		"Capture Asia and South America":
-			return $Board.player_controls_continent(player.get_id(), "Asia") and $Board.player_controls_continent(player.get_id(), "South America")
+			return $Board.player_controls_continent(player, "Asia") and $Board.player_controls_continent(player, "South America")
 		"Capture North America and Australia":
-			return $Board.player_controls_continent(player.get_id(), "North America") and $Board.player_controls_continent(player.get_id(), "Australia")
+			return $Board.player_controls_continent(player, "North America") and $Board.player_controls_continent(player, "Australia")
 		"Capture 24 territories":
 			return player.get_owned_duplicated($Board).size() >= 24
 		"Destroy all armies of a named opponent (if yourself, capture 24 territories)":
@@ -459,9 +476,6 @@ func handle_initial_adding(territory: Territory) -> void:
 		if initial_counter < 42 or initial_counter in [59, 76, 93, 109]:
 			next_turn()
 			$Ui.update_tallies(players._players, players.peek())
-		else:
-			if players.peek() is Ai:
-				players.peek().initial_adding(board)
 	
 	$Ui.update_timer_hacky_donotuse(str(initial_counter))
 
@@ -594,7 +608,11 @@ func next_turn() -> void:
 	var winner = is_game_over()
 	if winner:
 		redis.data["winner"] = winner
-		get_tree().change_scene_to_file("res://scenes/win.tscn")
+		#var win = preload("res://scenes/win.tscn").instantiate()
+		#win.z_index = 9
+		#add_child(win)
+		scene_tree.change_scene_to_file("res://scenes/win.tscn")
+		return
 
 	if state != GameState.INITIAL_STATE:
 		# go to next player until current player has troops
@@ -602,36 +620,53 @@ func next_turn() -> void:
 		#print(players.next().get_troops())
 		while not players.next().get_troops():
 			pass
-	
+			
+		if state != GameState.INITIAL_STATE:
+			change_game_state(GameState.ADDING_TROOPS)
+			troops_to_add = players.peek().count_bonus_troops($Board) + calculate_continent_bonus(players.peek()) # this calculation should probably be in player.gd
+			$Ui.update_troop_count(troops_to_add)
+	else:
+		players.next()
+
 	$TurnTimer.start(turn_time)
 	$Ui.update_tallies(players._players, players.peek())
-	if state != GameState.INITIAL_STATE:
-		change_game_state(GameState.ADDING_TROOPS)
-	troops_to_add = players.peek().count_bonus_troops($Board) + calculate_continent_bonus(players.peek()) # this calculation should probably be in player.gd
-	$Ui.update_troop_count(troops_to_add)
 	$Ui.update_timer_hacky_donotuse(str(troops_to_add))
 
-	var player = players.next()
-	if player is Ai:
+	if players.peek() is Ai:
+		$AiTimer.start(ai_sleep_time)
+
+func play_ai():
+	#print("I am the ai. I am playing my turn.")
+	var player = players.peek()
+	while players.peek() == player:
+		#print("SPECIAL DEBUG " + str(players.peek().get_id()))
 		match state:
 			GameState.ADDING_TROOPS:
+				#print("I am the troop placer. Troopmaxing")
 				player.place_troops(board, troops_to_add)
 			GameState.SELECT_ATTACKER:
+				#print("I am the attacker")
 				player.attack(board)
 			GameState.POST_ATTACK:
+				#print("I am the post attacker")
 				player.move_post_attack(board, attacking_territory, defender_territory)
 			GameState.MOVING_FROM:
-				player.move(board)
+				#print("I am the moving fromer")
+				if player.move(board):
+					change_turn.emit()
+					return
 			GameState.INITIAL_STATE:
+				#print("I am the initial stater")
 				player.initial_adding(board)
 
 func skip_stage() -> void:
 	print("Skipping?")
 	print(GameState.keys()[state])
 	var skip_to = {
+		GameState.ADDING_TROOPS: GameState.SELECT_ATTACKER,
 		GameState.SELECT_ATTACKER: GameState.MOVING_FROM,
 		GameState.SELECT_ATTACKED: GameState.MOVING_FROM,
-		GameState.POST_ATTACK: GameState.SELECT_ATTACKER,
+		GameState.POST_ATTACK: GameState.SELECT_ATTACKER
 	}
 	if skip_to.get(state, null) != null:
 		change_game_state(skip_to[state])

@@ -14,6 +14,7 @@ var indices_to_remove = []
 var owned: Array[Territory] = []
 var mission = null
 var _difficulty: float
+var timer
 #var territory_in_card_owned:bool = false
 
 func _init(id: int, initial_troops:int, difficulty: float, parent):
@@ -175,41 +176,60 @@ func assign_mission(mission_card):
 func get_mission():
 	return mission
 
-func move(board: Board) -> void:
+func move(board: Board) -> bool:
+	print("SANITY CHECK :)")
 	if randf() < _difficulty:
 		var territories_with_extra_troops = []
 		for territory in get_owned_duplicated(board):
 			if territory.get_troop_number() > 1:
 				territories_with_extra_troops.append(territory)
+		if territories_with_extra_troops.is_empty():
+			return true
+
 		var to_move_from = territories_with_extra_troops.pick_random()
 		var troops_to_move = randi_range(1, to_move_from.get_troop_number() - 1)
-		var to_move_to = get_owned_duplicated(board).pick_random()
+		if board.graph.all_connected_territories(to_move_from).is_empty():
+			return true
+		var to_move_to = board.graph.all_connected_territories(to_move_from).pick_random()
 
-		_parent.handle_moving_from(to_move_from)
-		_parent.handle_moving_to(to_move_to)
+		if to_move_from and to_move_to:
+			print(_name, " is moving from ", to_move_from.get_name())
+			print(" to ", to_move_to.get_name())
+			_parent.handle_moving_from(to_move_from)
+			for i in range(to_move_from.get_troop_number() - 1):
+				_parent.handle_moving_to(to_move_to)
+		else:
+			#_parent.next_turn()
+			return true
 		
 		if randf() < _difficulty:
-			_parent.skip_stage()
+			#_parent.next_turn()
+			return true
 
-		return
+		return false
 
 	var most_dangerous_position: Territory
 	var highest_danger_level: int
-	for territory: Territory in get_owned(board):
+	for territory: Territory in get_owned_duplicated(board):
 		var danger_level = -territory.get_troop_number()
 		var movable_to = false
 		var neighbour
 		for neighbour_id in board.graph.get_adjacent_nodes(territory.get_id()):
 			neighbour = board.graph.get_node(neighbour_id)
+			print(neighbour.get_ownership().get_id(), " ", territory.get_ownership().get_id())
 			if neighbour.get_ownership() != territory.get_ownership():
 				movable_to = true
+				#print("movable to !")
 				danger_level += neighbour.get_troop_number()
-		if movable_to and (most_dangerous_position or danger_level > highest_danger_level):
+		if movable_to and (most_dangerous_position == null or danger_level > highest_danger_level):
 			highest_danger_level = danger_level
 			most_dangerous_position = territory
+	
+	if most_dangerous_position == null:
+		return true
 
 	var most_spare_troops: Territory
-	for territory in board.graph.dfs(most_dangerous_position):
+	for territory in board.graph.all_connected_territories(most_dangerous_position):
 		var movable_from = true
 		var neighbour
 		for neighbour_id in board.graph.get_adjacent_nodes(territory.get_id()):
@@ -219,35 +239,42 @@ func move(board: Board) -> void:
 		if movable_from and neighbour.get_troop_number() > most_spare_troops.get_troop_number():
 			most_spare_troops = neighbour
 
+	print(_name + " is moving from " + most_spare_troops.get_name() + " to " + most_dangerous_position.get_name())
 	if most_spare_troops and most_dangerous_position:
 		_parent.handle_moving_from(most_spare_troops)
-		_parent.handle_moving_to(most_dangerous_position)
+		for i in range(most_dangerous_position.get_troop_number() - 1):
+				_parent.handle_moving_to(most_dangerous_position)
 	else:
-		_parent.skip_stage()
+		return true
+	return false
 
 func place_troops(board: Board, troops_to_add: int):
 	if troops_to_add > 0:
 		
 		if randf() < _difficulty:
-			_parent.handle_moving_from(get_owned_duplicated(board).pick_random())
+			_parent.handle_adding(get_owned_duplicated(board).pick_random())
 			return
 		
 		var most_dangerous_position: Territory
 		var highest_danger_level: int
-		for territory: Territory in get_owned(board):
+		for territory: Territory in get_owned_duplicated(board):
 			var danger_level = -territory.get_troop_number()
 			var movable_to = false
 			var neighbour
 			for neighbour_id in board.graph.get_adjacent_nodes(territory.get_id()):
 				neighbour = board.graph.get_node(neighbour_id)
+				print(neighbour.get_ownership().get_id(), " ", territory.get_ownership().get_id())
 				if neighbour.get_ownership() != territory.get_ownership():
 					movable_to = true
+					#print("movable to !")
 					danger_level += neighbour.get_troop_number()
-			if movable_to and (most_dangerous_position or danger_level > highest_danger_level):
+			if movable_to and (most_dangerous_position == null or danger_level > highest_danger_level):
 				highest_danger_level = danger_level
 				most_dangerous_position = territory
-
+	
 		_parent.handle_adding(most_dangerous_position)
+	else:
+		_parent.skip_stage()
 
 func initial_adding(board: Board):
 	var free_nodes = []
@@ -282,7 +309,7 @@ func initial_adding(board: Board):
 			_parent.handle_initial_adding(most_endangered_territories.pick_random())
 		return
 
-	if randi() < _difficulty:
+	if randf() < _difficulty:
 		_parent.handle_initial_adding(free_nodes.pick_random())
 		return
 	
@@ -318,7 +345,7 @@ func initial_adding(board: Board):
 func attack(board: Board):
 	var free_troops = []
 	
-	if randi() < _difficulty:
+	if randf() < _difficulty:
 		for node in get_owned_duplicated(board):
 			if node.get_troop_number() > 1:
 				for neighbour_id in board.graph.get_adjacent_nodes(node.get_id()):
@@ -326,9 +353,14 @@ func attack(board: Board):
 						free_troops.append(node)
 						break
 
+		if free_troops.is_empty():
+			_parent.skip_stage()
+			return
+
 		var attacker = free_troops.pick_random()
+
 		var adjacent_enemies = []
-		for node_id in board.graph.get_adjacent_nodes(attacker):
+		for node_id in board.graph.get_adjacent_nodes(attacker.get_id()):
 			if board.graph.get_node(node_id).get_ownership() != self:
 				adjacent_enemies.append(board.graph.get_node(node_id))
 		var attacked = adjacent_enemies.pick_random()
@@ -344,7 +376,7 @@ func attack(board: Board):
 		if node.get_troop_number() - adjacent_troops >= 3:
 			free_troops.append(node)
 
-	if not free_troops:
+	if free_troops.is_empty():
 		_parent.skip_stage()
 		return
 
@@ -357,18 +389,25 @@ func attack(board: Board):
 			attacked = board.graph.get_node(neighbour)
 			break
 
-	if not attacked:
+	if attacked == null:
 		var attackables = []
 		for neighbour in board.graph.get_adjacent_nodes(attacker.get_id()):
 			if board.graph.get_node(neighbour).get_ownership() != attacker.get_ownership():
 				attackables.append(board.graph.get_node(neighbour))
+		if attackables.is_empty():
+			_parent.skip_stage()
+			return
 		attacked = attackables.pick_random()
 	
+	if null in [attacker, attacked]:
+		_parent.skip_stage()
+		return
+		
 	_parent.handle_selecting_attacker(attacker)
 	_parent.handle_select_attacked(attacked)
 
 func move_post_attack(board: Board, attacker: Territory, attacked: Territory):
-	if randi() < _difficulty:
+	if randf() < _difficulty:
 		_parent.handle_moving_post_attack(attacked)
 	
 	for neighbour in board.graph.get_adjacent_nodes(attacker.get_id()):

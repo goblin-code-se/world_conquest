@@ -186,7 +186,7 @@ Rick!
 func player_controls_continent(player, continent_name: String):
 	var territories = $Continents.get_node(continent_name).get_children()
 	for territory in territories:
-		if territory.get_ownership() != player:
+		if territory.get_ownership() == null or territory.get_ownership() != player:
 			return false
 	return true
 

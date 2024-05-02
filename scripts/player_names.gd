@@ -19,7 +19,7 @@ func _ready():
 			players[i]["ai"] = is_ai
 			
 			var difficulty = node.get_node("OptionButton").get_selected_id()
-			var diff_percent = [0.4, 0.5, 0.7][difficulty]
+			var diff_percent = [0.7, 0.55, 0.2, 0.0][difficulty]
 
 			players[i]["ai_difficulty"] = difficulty
 			

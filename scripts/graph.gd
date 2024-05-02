@@ -97,3 +97,16 @@ func all_territories_connected() -> bool:
 		if node not in nodes:
 			return false
 	return true
+
+func all_connected_territories(territory: Territory) -> Array[Territory]:
+	print("insanity check .-.")
+	var nodes: Array[Territory] = [territory]
+	var checked = 0
+	while checked < nodes.size():
+		for node_id in _graph[nodes[checked].get_id()]:
+			var node_obj = get_node(node_id)
+			var unvisited = node_obj not in nodes
+			if unvisited and node_obj.get_ownership() == territory.get_ownership():
+				nodes.append(node_obj)
+		checked += 1
+	return nodes.slice(1)

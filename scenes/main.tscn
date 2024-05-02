@@ -23,5 +23,7 @@ z_index = 1
 points = PackedVector2Array(0, 0, 100, 100)
 default_color = Color(0, 1, 0, 1)
 
+[node name="AiTimer" type="Timer" parent="."]
+
 [connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

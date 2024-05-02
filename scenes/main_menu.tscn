@@ -1,0 +1,89 @@
+[gd_scene load_steps=3 format=3 uid="uid://bu8owrxkue4j2"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_24gw0"]
+
+[sub_resource type="Theme" id="Theme_e3j6r"]
+default_base_scale = 1.0
+default_font_size = 48
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = SubResource("Theme_e3j6r")
+script = ExtResource("1_24gw0")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.117647, 0.117647, 0.180392, 1)
+
+[node name="Centerer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuButtons" type="VBoxContainer" parent="Centerer"]
+custom_minimum_size = Vector2(700, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CenterContainer" type="CenterContainer" parent="Centerer/MenuButtons"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Centerer/MenuButtons/CenterContainer"]
+custom_minimum_size = Vector2(595, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/bold_font_size = 73
+bbcode_enabled = true
+text = "[wave][b][u]World Conquest[/u][/b][/wave]"
+fit_content = true
+
+[node name="Spacer" type="Control" parent="Centerer/MenuButtons"]
+custom_minimum_size = Vector2(2.08165e-12, 30)
+layout_mode = 2
+
+[node name="NormalGame" type="Button" parent="Centerer/MenuButtons"]
+layout_mode = 2
+text = "Play Normal Mode"
+
+[node name="MissionGame" type="Button" parent="Centerer/MenuButtons"]
+layout_mode = 2
+text = "Play Mission Mode"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Centerer/MenuButtons"]
+layout_mode = 2
+
+[node name="BoardEditor" type="Button" parent="Centerer/MenuButtons/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Board Editor"
+
+[node name="Spacer" type="Control" parent="Centerer/MenuButtons/HBoxContainer"]
+custom_minimum_size = Vector2(10, 2.08165e-12)
+layout_mode = 2
+
+[node name="Options" type="Button" parent="Centerer/MenuButtons/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Options
+"
+
+[node name="Quit" type="Button" parent="Centerer/MenuButtons"]
+layout_mode = 2
+text = "Quit to Desktop"

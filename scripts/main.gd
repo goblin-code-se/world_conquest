@@ -2,6 +2,8 @@ extends Node
 
 const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to properly start at 5:00 and not 4:59
 var state: GameState
+var _connecting := false
+var _connecting_from
 var attacking_territory
 var defender_territory
 var adjacent_territories
@@ -9,7 +11,7 @@ var moving_from: Territory
 var moving_to: Territory
 var continent_bonuses: Dictionary
 "Mission mode NEEDS to receive a signal from the interface for mission mode to be activated.."
-var Mission_mode: bool = false
+var mission_mode: bool = false
 var territory_cards = []
 var conquered_one: bool = false
 var card_trade_count = 0
@@ -65,9 +67,10 @@ func _ready():
 	$Ui.end_turn_clicked.connect(next_turn)
 	$Ui.skip_stage_clicked.connect(skip_stage)
 	$Ui.trade_clicked.connect(func(): _on_trade_clicked())
+	$Board.register_territory_handlers(draw_arrow)
 	
 	# Mission mode
-	if Mission_mode:
+	if mission_mode:
 		random_opp = players.get_all().pick_random()
 		assign_mission_cards_to_players(players)
 		print("your opponent is: player ", random_opp.get_id())
@@ -85,6 +88,25 @@ func _process(delta):
 	if Input.is_key_pressed(KEY_W):
 		redis.data["winner"] = players.peek()
 		get_tree().change_scene_to_file("res://scenes/win.tscn")
+	
+	var draw_arrow_states = [GameState.SELECT_ATTACKED, GameState.MOVING_TO, GameState.POST_ATTACK]
+	$MoveLine.visible = state in draw_arrow_states
+	if state in draw_arrow_states:
+		var mouse_pos = get_viewport().get_mouse_position()
+		var from_territory
+		if state == GameState.SELECT_ATTACKED:
+			from_territory = attacking_territory
+			$MoveLine.default_color = Color.RED
+		elif state == GameState.MOVING_TO or state == GameState.POST_ATTACK:
+			from_territory = moving_from
+			$MoveLine.default_color = Color.BLUE
+		$MoveLine.clear_points()
+		$MoveLine.add_point(attacking_territory.position)
+		$MoveLine.add_point(mouse_pos)
+
+func draw_arrow(node):
+	pass
+
 
 """Rick!"""
 
@@ -326,8 +348,6 @@ func handle_moving_post_attack(which: Territory):
 	else: 
 		print("Not the territory you just conquered. Please click on the correct territory: ", defender_territory.get_name())
 		change_game_state(GameState.POST_ATTACK)
-			
-
 
 func calculate_continent_bonus(player: Player):
 	var bonus = 0
@@ -386,7 +406,7 @@ checks if every node in the board belongs to one player id (game over)
 """
 
 func is_game_over():
-	if not Mission_mode:
+	if not mission_mode:
 		var graph = $Board.graph
 		var winner = graph.get_nodes()[0].get_ownership()
 		for node in graph.get_nodes():
@@ -586,6 +606,3 @@ func skip_stage() -> void:
 
 func _on_turn_timer_timeout():
 	next_turn()
-
-
-	

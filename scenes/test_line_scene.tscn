@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bdxp2e3k486aj"]
+
+[ext_resource type="Script" path="res://scenes/test_line_scene.gd" id="1_egjil"]
+[ext_resource type="PackedScene" uid="uid://blrkyg0hd0el0" path="res://scenes/line.tscn" id="2_te16r"]
+
+[node name="TestLineScene" type="Node2D"]
+script = ExtResource("1_egjil")
+
+[node name="Node2D" parent="." instance=ExtResource("2_te16r")]

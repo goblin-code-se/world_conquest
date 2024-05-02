@@ -1,5 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bjvf2sjhtlff2"]
+[gd_scene load_steps=4 format=3 uid="uid://bjvf2sjhtlff2"]
 
+[ext_resource type="Script" path="res://scripts/player_names.gd" id="1_ghc7y"]
 [ext_resource type="Theme" uid="uid://cmnpc1gvwfmpt" path="res://new_theme.tres" id="1_kn1k3"]
 [ext_resource type="PackedScene" uid="uid://cychvnja24fu2" path="res://scenes/player_names_individual.tscn" id="2_fmbx8"]
 
@@ -10,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_ghc7y")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -35,19 +37,19 @@ theme = ExtResource("1_kn1k3")
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+[node name="1" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
 layout_mode = 2
 
-[node name="HBoxContainer2" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+[node name="2" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
 layout_mode = 2
 
-[node name="HBoxContainer3" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+[node name="3" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
 layout_mode = 2
 
-[node name="HBoxContainer4" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+[node name="4" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
 layout_mode = 2
 
-[node name="HBoxContainer5" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
+[node name="5" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
 layout_mode = 2
 
 [node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]

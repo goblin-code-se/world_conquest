@@ -33,8 +33,11 @@ enum GameState {
 	INITIAL_STATE,
 }
 
+var redis = preload("res://redis.tres")
+
 func _ready():
 	print("READY (main.gd)")
+	print(redis.data)
 	# Player initialization
 	var arr: Array[Player] = []
 	for i in range(1, 6):

@@ -2,7 +2,7 @@ extends Control
 
 func _ready():
 	$Centerer/MenuButtons/NormalGame.pressed.connect(func(): 
-		get_tree().change_scene_to_file("res://scenes/main.tscn")
+		get_tree().change_scene_to_file("res://scenes/player_names.tscn")
 	)
 	$Centerer/MenuButtons/MissionGame.pressed.connect(func(): 
 		get_tree().change_scene_to_file("res://scenes/main.tscn")

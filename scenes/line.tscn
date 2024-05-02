@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://blrkyg0hd0el0"]
+
+[ext_resource type="Script" path="res://scripts/line.gd" id="2_ndds8"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_mraar"]
+b = Vector2(100, 100)
+
+[node name="Node2D" type="Area2D"]
+script = ExtResource("2_ndds8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_mraar")
+one_way_collision_margin = 0.0
+debug_color = Color(0.513726, 0.576471, 0, 0.419608)
+
+[node name="Line2D" type="Line2D" parent="."]
+visible = false
+default_color = Color(0, 1, 1, 0.552941)
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
+[connection signal="mouse_shape_entered" from="." to="." method="_on_mouse_shape_entered"]

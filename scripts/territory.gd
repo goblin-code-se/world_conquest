@@ -1,18 +1,17 @@
 extends Node2D
 class_name Territory
 
-var _continent: String
 var _owner: Player
 var _troop_number: int
 var _hover: bool
 var _selected: bool = false
 var _graph_id: int
 
+signal pressed
 signal territory_clicked(which)
 # Called when the node enters the scene tree for the first time.
 
 func _ready():
-	_continent = "test continent"
 	_troop_number = 0
 	_owner = null
 	$TerritoryName.text = self.get_name()
@@ -38,7 +37,8 @@ func update_info() -> void:
 	$TroopCount.text = str(_troop_number)
 	$HoverInfo.text = "continent: {0}
 	who_owns: {1}
-	graph_id: {2}".format([_continent, player_name, str(_graph_id)])
+	graph_id: {2}".format([get_continent(), player_name, str(_graph_id)])
+	$TerritoryName.text = self.get_name()
 
 func get_ownership() -> Player:
 	return _owner
@@ -47,10 +47,9 @@ func set_ownership(player: Player) -> void:
 	_owner = player
 	update_info()
 	update_sprite()
-	
-func set_continent(continent: String) -> void:
-	_continent = continent
-	update_info()
+
+func get_continent() -> String:
+	return get_parent().name
 
 func increment_troops(count: int) -> void:
 	_troop_number += count
@@ -101,9 +100,9 @@ func _on_mouse_exited():
 		$SelectBox.hide()
 	$HoverInfo.hide()
 	_hover = false
-	
 
 func _on_input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.pressed and \
 	 event.button_index == MOUSE_BUTTON_LEFT and _hover:
 			territory_clicked.emit(self)
+			pressed.emit()

@@ -1,0 +1,75 @@
+[gd_scene load_steps=4 format=3 uid="uid://cppgnv6edb08g"]
+
+[ext_resource type="Script" path="res://scripts/board_editor.gd" id="1_hi10e"]
+[ext_resource type="PackedScene" uid="uid://wjitd0lowq3q" path="res://scenes/board.tscn" id="2_b4gwk"]
+[ext_resource type="Texture2D" uid="uid://c38orgkaclkmq" path="res://assets/white1x1.png" id="2_gwtfw"]
+
+[node name="BoardEditor" type="Node2D"]
+script = ExtResource("1_hi10e")
+
+[node name="Board" parent="." instance=ExtResource("2_b4gwk")]
+
+[node name="MenuBar" type="Control" parent="."]
+z_index = 1
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1.0
+offset_top = -45.0
+offset_right = 41.0
+offset_bottom = -5.0
+
+[node name="MenuBarTexture" type="TextureRect" parent="MenuBar"]
+modulate = Color(0.980392, 0.827451, 0.498039, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.924
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_top = 959.04
+offset_right = 1879.0
+offset_bottom = 1127.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("2_gwtfw")
+expand_mode = 1
+
+[node name="Container" type="HBoxContainer" parent="MenuBar"]
+layout_mode = 0
+offset_top = 996.0
+offset_right = 1919.0
+offset_bottom = 1126.0
+alignment = 1
+
+[node name="SpacerEnd2" type="Control" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(20, 2.08165e-12)
+layout_mode = 2
+
+[node name="ResetButton" type="Button" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "RESET"
+
+[node name="StretchySpacer" type="Control" parent="MenuBar/Container"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(180, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 16
+text = "Save board"
+
+[node name="SpacerEnd" type="Control" parent="MenuBar/Container"]
+custom_minimum_size = Vector2(20, 2.08165e-12)
+layout_mode = 2
+
+[node name="Line2D" type="Line2D" parent="."]
+visible = false
+z_index = 1
+points = PackedVector2Array(0, 0, 100, 100)
+default_color = Color(0, 1, 0, 1)

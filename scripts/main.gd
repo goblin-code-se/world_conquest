@@ -689,7 +689,7 @@ func next_turn() -> void:
 		# go to next player until current player has troops
 		# while loop is empty as all logic is in condition
 		#print(players.next().get_troops())
-		while not players.next().get_troops():
+		while players.next().get_troops() <= 0:
 			pass
 			
 		if state != GameState.INITIAL_STATE:

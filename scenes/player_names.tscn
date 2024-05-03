@@ -52,6 +52,62 @@ layout_mode = 2
 [node name="5" parent="CenterContainer/VBoxContainer" instance=ExtResource("2_fmbx8")]
 layout_mode = 2
 
+[node name="AIThought" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/AIThought"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "AI thought time"
+horizontal_alignment = 2
+
+[node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer/AIThought"]
+layout_mode = 2
+item_count = 4
+selected = 0
+popup/item_0/text = "Realistic"
+popup/item_0/id = 0
+popup/item_1/text = "Quick"
+popup/item_1/id = 1
+popup/item_2/text = "Instant"
+popup/item_2/id = 2
+popup/item_3/text = "Faster Than Light"
+popup/item_3/id = 3
+
+[node name="DiceRolls" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/DiceRolls"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Dice rolls"
+horizontal_alignment = 2
+
+[node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer/DiceRolls"]
+layout_mode = 2
+item_count = 2
+selected = 0
+popup/item_0/text = "Realistic"
+popup/item_0/id = 0
+popup/item_1/text = "Instant"
+popup/item_1/id = 1
+
+[node name="Turn Time" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/Turn Time"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Turn Time"
+horizontal_alignment = 2
+
+[node name="SpinBox" type="SpinBox" parent="CenterContainer/VBoxContainer/Turn Time"]
+layout_mode = 2
+min_value = 1.0
+max_value = 30.0
+value = 5.0
+suffix = "mins"
+
 [node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 text = "START GAME"

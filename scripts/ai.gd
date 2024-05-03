@@ -179,6 +179,7 @@ func get_mission():
 func move(board: Board) -> bool:
 	print("SANITY CHECK :)")
 	if randf() < _difficulty:
+		print("i am going to fuck up now")
 		var territories_with_extra_troops = []
 		for territory in get_owned_duplicated(board):
 			if territory.get_troop_number() > 1:
@@ -216,7 +217,7 @@ func move(board: Board) -> bool:
 		var neighbour
 		for neighbour_id in board.graph.get_adjacent_nodes(territory.get_id()):
 			neighbour = board.graph.get_node(neighbour_id)
-			print(neighbour.get_ownership().get_id(), " ", territory.get_ownership().get_id())
+			# print(neighbour.get_ownership().get_id(), " ", territory.get_ownership().get_id())
 			if neighbour.get_ownership() != territory.get_ownership():
 				movable_to = true
 				#print("movable to !")
@@ -236,11 +237,17 @@ func move(board: Board) -> bool:
 			neighbour = board.graph.get_node(neighbour_id)
 			if neighbour.get_ownership() != territory.get_ownership():
 				movable_from = false
-		if movable_from and neighbour.get_troop_number() > most_spare_troops.get_troop_number():
+		var tmp
+		if most_spare_troops:
+			tmp = most_spare_troops.get_troop_number()
+		else:
+			tmp = 0
+		if movable_from and neighbour.get_troop_number() > tmp:
 			most_spare_troops = neighbour
 
-	print(_name + " is moving from " + most_spare_troops.get_name() + " to " + most_dangerous_position.get_name())
+
 	if most_spare_troops and most_dangerous_position:
+		print(_name + " is moving from " + most_spare_troops.get_name() + " to " + most_dangerous_position.get_name())
 		_parent.handle_moving_from(most_spare_troops)
 		for i in range(most_dangerous_position.get_troop_number() - 1):
 				_parent.handle_moving_to(most_dangerous_position)
@@ -252,6 +259,8 @@ func place_troops(board: Board, troops_to_add: int):
 	if troops_to_add > 0:
 		
 		if randf() < _difficulty:
+			if get_owned_duplicated(board).is_empty():
+				return
 			_parent.handle_adding(get_owned_duplicated(board).pick_random())
 			return
 		

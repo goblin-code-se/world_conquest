@@ -25,7 +25,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.083, 0, 0)
 script = ExtResource("1_l8wuj")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -0.000855251, 1, 0, -1, -0.000855251, 0, 1.00642, 0.0173473)
+transform = Transform3D(1, 0, 0, 0, -0.000855251, 1, 0, -1, -0.000855251, 0, 1.2341, -0.0019202)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 transform = Transform3D(1.415, 0, 0, 0, 1.415, 0, 0, 0, 1.415, 0, 0, 0)
@@ -73,3 +73,6 @@ transform = Transform3D(0.25, -1.74393e-16, -3.81149e-24, -3.81149e-24, -1.09278
 visible = false
 text = "[2,3,4]"
 font_size = 128
+
+[node name="ResultsShowTimer" type="Timer" parent="."]
+one_shot = true

@@ -19,11 +19,21 @@ func _ready():
 			players[i]["ai"] = is_ai
 			
 			var difficulty = node.get_node("OptionButton").get_selected_id()
-			var diff_percent = [0.7, 0.55, 0.2, 0.0][difficulty]
+			var diff_percent = [0.3, 0.45, 0.8, 1.0][difficulty]
 
-			players[i]["ai_difficulty"] = difficulty
+			players[i]["ai_difficulty"] = diff_percent
 			
 		redis.data["players"] = players
+		
+		var ai_thought_time = $CenterContainer/VBoxContainer/AIThought/OptionButton.get_selected_id()
+		redis.data["ai_thought_time"] = [0.7, 0.1, 0.02, 0.000000000000001][ai_thought_time]
+		
+		var dice_roll_speed = $CenterContainer/VBoxContainer/DiceRolls/OptionButton.get_selected_id()
+		redis.data["fake_rolls"] = dice_roll_speed == 1
+		
+		var turn_time = $"CenterContainer/VBoxContainer/Turn Time/SpinBox".value
+		redis.data["turn_time"] = turn_time*60+0.5
+		
 		print(redis.data)
 		get_tree().change_scene_to_file("res://scenes/main.tscn")
 	)

@@ -1,10 +1,10 @@
 extends Node
 
-const ai_sleep_time = 0.2
-const turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to properly start at 5:00 and not 4:59
+var fake_rolls = false
+var ai_sleep_time = 0.2
+var turn_time = 5*60+0.5 # Five minutes max for a turn, with small offset to properly start at 5:00 and not 4:59
 var state: GameState
-var _connecting := false
-var _connecting_from
+var waiting_on_die_roll := false
 var attacking_territory
 var defender_territory
 var adjacent_territories
@@ -48,7 +48,15 @@ func _ready():
 	board = $Board
 	print("READY (main.gd)")
 	print(redis.data)
+	
+	ai_sleep_time = redis.data["ai_thought_time"]
+	fake_rolls = redis.data["fake_rolls"]
+	turn_time = redis.data["turn_time"]
 	mission_mode = redis.data["mission_mode"]
+	
+	if fake_rolls:
+		$TextureRect.visible = false
+	
 	# Player initialization
 	var arr = []
 	for i in range(1, 6):
@@ -88,7 +96,6 @@ func _ready():
 	$Ui.end_turn_clicked.connect(next_turn)
 	$Ui.skip_stage_clicked.connect(skip_stage)
 	$Ui.trade_clicked.connect(func(): _on_trade_clicked())
-	$Board.register_territory_handlers(draw_arrow)
 	
 	# Mission mode
 	if mission_mode:
@@ -98,13 +105,12 @@ func _ready():
 
 	$Ui.update_tallies(players._players, players.peek())
 	
-	var player = players.peek()
 	if players.peek() is Ai:
 		$AiTimer.start(ai_sleep_time)
-		#start_ai_turn.emit(players.peek())
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	$Ui.update_timer($TurnTimer.get_time_left())
 	if state == GameState.INITIAL_STATE and Input.is_key_pressed(KEY_S) \
 	 and not skip_lock:
@@ -115,6 +121,14 @@ func _process(delta):
 	
 	# Arrow silly rendering
 	if players.peek() is Ai:
+		if waiting_on_die_roll:
+			$MoveLine.visible = true
+			$MoveLine.default_color = Color.RED
+			$MoveLine.clear_points()
+			$MoveLine.add_point(redis.data["ai_draw_line_atk"].position)
+			$MoveLine.add_point(redis.data["ai_draw_line_def"].position)
+		else:
+			$MoveLine.visible = false
 		return
 	var draw_arrow_states = [GameState.SELECT_ATTACKED, GameState.MOVING_TO, GameState.POST_ATTACK]
 	$MoveLine.visible = state in draw_arrow_states
@@ -132,9 +146,6 @@ func _process(delta):
 			$MoveLine.add_point(from_territory.position)
 			$MoveLine.add_point(mouse_pos)
 
-func draw_arrow(node):
-	pass
-
 func broadcast_message(message):
 	$Broadcast.text += "\n" + message
 	# $BroadcastTimer.start(5.0)
@@ -150,25 +161,63 @@ func clear_broadcast_message():
 #Also, probably a more descriptive name would be populate_adjacent_list or something like that
 
 func attack(attacking_territory: Territory, defender_territory: Territory):
-	var attacker_losses = 0
-	var defender_losses = 0
 	var attacker_dice_count = min(3, attacking_territory.get_troop_number() - 1)
 	var defender_dice_count = min(2, defender_territory.get_troop_number())
 	var defender = defender_territory.get_ownership()
 	var attacker = players.peek()
-	var attack_dice = []
-	print("the attacker is ", attacker.get_id())
-	print("the defender is ", defender.get_id())
-	for i in range(attacker_dice_count):
-		attack_dice.append(randi_range(1, 6))
-	attack_dice.sort()
-	attack_dice.reverse()
 	
-	var defense_dice = []
-	for i in range(defender_dice_count):
-		defense_dice.append(randi_range(1, 6))
-	defense_dice.sort()
-	defense_dice.reverse()
+	waiting_on_die_roll = true
+	if not fake_rolls:
+		redis.data["ai_draw_line_atk"] = attacking_territory
+		redis.data["ai_draw_line_def"] = defender_territory
+		roll(attacking_territory, defender_territory, true, min(3, attacking_territory.get_troop_number() - 1))
+	else:
+		 # old fake dice rolls
+		var attack_dice = []
+		print("the attacker is ", attacker.get_id())
+		print("the defender is ", defender.get_id())
+		for i in range(attacker_dice_count):
+			attack_dice.append(randi_range(1, 6))
+		attack_dice.sort()
+		attack_dice.reverse()
+		
+		var defense_dice = []
+		for i in range(defender_dice_count):
+			defense_dice.append(randi_range(1, 6))
+		defense_dice.sort()
+		defense_dice.reverse()
+		redis.data["attack_dice"] = attack_dice
+		redis.data["defense_dice"] = defense_dice
+		attack_pt_2(attacking_territory, defender_territory)
+
+func roll(attacking_territory: Territory, defender_territory: Territory, attacking: bool, count: int):
+	
+	for connection in $TextureRect/SubViewport/DiceRoll.results.get_connections():
+		$TextureRect/SubViewport/DiceRoll.results.disconnect(connection.callable)
+	
+	$TextureRect.visible = true
+	$TextureRect/SubViewport/DiceRoll.reset(attacking, count, broadcast)
+
+	if attacking:
+		$TextureRect/SubViewport/DiceRoll.results.connect(func(results):
+			redis.data["attack_dice"] = results
+			roll(attacking_territory, defender_territory, false, min(2, defender_territory.get_troop_number()))
+		, CONNECT_DEFERRED)
+	else:
+		$TextureRect/SubViewport/DiceRoll.results.connect(func(results):
+			redis.data["defense_dice"] = results
+			attack_pt_2(attacking_territory, defender_territory)
+		, CONNECT_DEFERRED)
+	return
+
+func attack_pt_2(attacking_territory: Territory, defender_territory: Territory):
+	var attacker_losses = 0
+	var defender_losses = 0
+	var attack_dice = redis.data["attack_dice"]
+	var defense_dice = redis.data["defense_dice"]
+	print("attacking continuing")
+	var defender = defender_territory.get_ownership()
+	var attacker = players.peek()
 	
 	for i in range(min(attack_dice.size(), defense_dice.size())):
 		if attack_dice[i] > defense_dice[i]:
@@ -193,17 +242,17 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 		#players.peek().add_territory(defender_territory)
 		#attacking_territory.decrement_troops(attacker_dice_count)
 		#defender_territory.increment_troops(attacker_dice_count)
-		move(attacking_territory, defender_territory, attacker_dice_count)
+		move(attacking_territory, defender_territory, min(3, attacking_territory.get_troop_number() - 1))
 	else:
 		change_game_state(GameState.SELECT_ATTACKER)
 	#print(territory_cards.size())
 	if not defender.get_troops():
 		#print("defender cards: ", defender.get_cards())
-		broadcast.emit(defender.get_id(), " eliminated. Cards passing to", attacker)
+		broadcast.emit(defender._name + " eliminated. Cards passing to" + attacker._name)
 		#print("attacker cards: ", attacker.get_cards())
 		for card in defender.get_cards():
 			attacker.add_card(card)
-		broadcast.emit("attacker cards now: ", attacker.get_cards())
+		broadcast.emit("attacker cards now: " + str(attacker.get_cards()))
 	if attacker.get_cards().size() >= 5:
 		broadcast.emit("You have accumulated 5 or more cards! You must trade now!")
 		$TurnTimer.start(turn_time)
@@ -212,14 +261,17 @@ func attack(attacking_territory: Territory, defender_territory: Territory):
 		$Ui.update_timer_hacky_donotuse(str(troops_to_add))
 	"else:
 		change_game_state(GameState.SELECT_ATTACKER)"
+	waiting_on_die_roll = false
+	if players.peek() is Ai:
+		start_ai_turn.emit(players.peek())
  
 
 func end_of_turn_draw_card(player):
 	if conquered_one:
 		var card = draw_territory_card()
 		player.add_card(card)
-		broadcast.emit("Player ", player.get_id(), " drew a card:", card.name)
-		broadcast.emit("cards of player ", player.get_id(), " are: ", player.get_cards())
+		broadcast.emit("Player " + player._name + " drew a card:" + card.name)
+		broadcast.emit("cards of player " + player._name + " are: " + str(player.get_cards()))
 		player.reset_conquest()
 		conquered_one = false
 
@@ -321,7 +373,7 @@ func trade_cards(player):
 		#current_player.increment_troops(troops_awarded)
 		card_trade_count += 1
 		#current_player.remove_traded_cards()
-		broadcast.emit("Player ", player.get_id(), " traded 1 set of cards for ", troops_awarded, " troops")
+		broadcast.emit("Player " + player._name + " traded 1 set of cards for " + str(troops_awarded) + " troops")
 		player.trading_set_used(territory_cards, $Board)
 		#player.reset_traded_cards()
 		troops_to_add += troops_awarded
@@ -354,7 +406,6 @@ func calculate_card_bonus() -> int:
 main state machine function, handling clicks based on current game state
 """
 func _on_board_territory_clicked(which: Territory) -> void:
-	var initial_troops_depleted: bool = false
 	match state:
 		GameState.ADDING_TROOPS:
 			handle_adding(which)
@@ -395,7 +446,7 @@ func calculate_continent_bonus(player):
 	for continent_name in continent_bonuses.keys():
 		if $Board.player_controls_continent(player, continent_name):
 			bonus += continent_bonuses[continent_name]
-			broadcast.emit("Player ", player.get_id()," controls the continent ", continent_name, " thus gets awarded ", bonus, " extra troops.")
+			broadcast.emit("Player " + player._name + " controls the continent " + continent_name + " thus gets awarded " + str(bonus) + " extra troops.")
 	return bonus
 	
 
@@ -429,7 +480,7 @@ func check_mission_completion(player) -> bool:
 		_:
 			return false
 
-func is_opp_eliminated(player, board: Board) -> bool:
+func is_opp_eliminated(player, _board: Board) -> bool:
 	return not player._troops
 
 func _on_trade_clicked():
@@ -526,6 +577,11 @@ func handle_adding(territory: Territory) -> void:
 
 
 func add_troop_to_territory(territory: Territory) -> bool:
+
+	# ok whatever
+	if territory == null:
+		return false
+	
 	# Player is not allowed to occupy this territory
 	if territory.get_ownership() not in [players.peek(), null]:
 		return false
@@ -657,8 +713,13 @@ func next_turn() -> void:
 func play_ai():
 	#print("I am the ai. I am playing my turn.")
 	var player = players.peek()
+	if not player is Ai:
+		return
 	while players.peek() == player:
+		if waiting_on_die_roll:
+			return
 		#print("SPECIAL DEBUG " + str(players.peek().get_id()))
+		print(state)
 		match state:
 			GameState.ADDING_TROOPS:
 				#print("I am the troop placer. Troopmaxing")
@@ -677,6 +738,10 @@ func play_ai():
 			GameState.INITIAL_STATE:
 				#print("I am the initial stater")
 				player.initial_adding(board)
+			_:
+				print("Oh you poor thing.")
+				change_turn.emit()
+				return
 
 func skip_stage() -> void:
 	print("Skipping?")

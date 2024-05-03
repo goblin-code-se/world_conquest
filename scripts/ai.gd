@@ -209,51 +209,42 @@ func move(board: Board) -> bool:
 
 		return false
 
-	var most_dangerous_position: Territory
-	var highest_danger_level: int
+	var movable_to = []
 	for territory: Territory in get_owned_duplicated(board):
-		var danger_level = -territory.get_troop_number()
-		var movable_to = false
 		var neighbour
 		for neighbour_id in board.graph.get_adjacent_nodes(territory.get_id()):
 			neighbour = board.graph.get_node(neighbour_id)
 			# print(neighbour.get_ownership().get_id(), " ", territory.get_ownership().get_id())
 			if neighbour.get_ownership() != territory.get_ownership():
-				movable_to = true
-				#print("movable to !")
-				danger_level += neighbour.get_troop_number()
-		if movable_to and (most_dangerous_position == null or danger_level > highest_danger_level):
-			highest_danger_level = danger_level
-			most_dangerous_position = territory
+				movable_to.append(territory)
+				break
 	
-	if most_dangerous_position == null:
+	if movable_to.is_empty():
 		return true
-
-	var most_spare_troops: Territory
-	for territory in board.graph.all_connected_territories(most_dangerous_position):
-		var movable_from = true
+	var to = movable_to.pick_random()
+	
+	var movable_from = []
+	for territory in board.graph.all_connected_territories(to):
+		var can_move_from = true
 		var neighbour
 		for neighbour_id in board.graph.get_adjacent_nodes(territory.get_id()):
 			neighbour = board.graph.get_node(neighbour_id)
 			if neighbour.get_ownership() != territory.get_ownership():
-				movable_from = false
-		var tmp
-		if most_spare_troops:
-			tmp = most_spare_troops.get_troop_number()
-		else:
-			tmp = 0
-		if movable_from and neighbour.get_troop_number() > tmp:
-			most_spare_troops = neighbour
-
-
-	if most_spare_troops and most_dangerous_position:
-		print(_name + " is moving from " + most_spare_troops.get_name() + " to " + most_dangerous_position.get_name())
-		_parent.handle_moving_from(most_spare_troops)
-		for i in range(most_dangerous_position.get_troop_number() - 1):
-				_parent.handle_moving_to(most_dangerous_position)
-	else:
+				can_move_from = false
+		if can_move_from:
+			movable_from.append(territory)
+			
+	if movable_from.is_empty():
 		return true
-	return false
+	
+	var from = movable_from.pick_random()
+
+	print(_name + " is moving from " + from.get_name() + " to " + to.get_name())
+	_parent.handle_moving_from(from)
+	for i in range(from.get_troop_number() - 1):
+			_parent.handle_moving_to(to)
+
+	return true
 
 func place_troops(board: Board, troops_to_add: int):
 	if troops_to_add > 0:
@@ -280,7 +271,7 @@ func place_troops(board: Board, troops_to_add: int):
 			if movable_to and (most_dangerous_position == null or danger_level > highest_danger_level):
 				highest_danger_level = danger_level
 				most_dangerous_position = territory
-	
+		print("PLACING UNIT AT: " + most_dangerous_position.get_name())
 		_parent.handle_adding(most_dangerous_position)
 	else:
 		_parent.skip_stage()
@@ -378,40 +369,43 @@ func attack(board: Board):
 		return
 
 	for node in get_owned_duplicated(board):
-		var adjacent_troops = 0
 		for neighbour in board.graph.get_adjacent_nodes(node.get_id()):
-			if board.graph.get_node(neighbour).get_ownership() != self:
-				adjacent_troops += board.graph.get_node(neighbour).get_troop_number()
-		if node.get_troop_number() - adjacent_troops >= 3:
-			free_troops.append(node)
-
+			if board.graph.get_node(neighbour).get_ownership().get_id() != get_id():
+				print("ATTACK: ", node.get_troop_number(), "-", board.graph.get_node(neighbour).get_troop_number(), "=", node.get_troop_number() - board.graph.get_node(neighbour).get_troop_number(), ">= 3: ", node.get_troop_number() - board.graph.get_node(neighbour).get_troop_number() >= 3)
+				if node.get_troop_number() - board.graph.get_node(neighbour).get_troop_number() >= 3:
+					free_troops.append(node)
+	
 	if free_troops.is_empty():
+		print("ATTACK: free troops more like free goops amirite hahahaha")
 		_parent.skip_stage()
 		return
 
 	var attacker = free_troops.pick_random()
-	var attacked
+	var attackable = []
 
 	for neighbour in board.graph.get_adjacent_nodes(attacker.get_id()):
 		if board.graph.get_node(neighbour).get_ownership() != attacker.get_ownership() \
-		 and board.graph.get_node(neighbour).get_continent() == attacker.get_continent():
-			attacked = board.graph.get_node(neighbour)
-			break
-
-	if attacked == null:
-		var attackables = []
+		 and board.graph.get_node(neighbour).get_continent() == attacker.get_continent() \
+		 and board.graph.get_node(neighbour).get_troop_number() <= attacker.get_troop_number() + 5:
+			attackable.append(board.graph.get_node(neighbour))
+	
+	if attackable.is_empty():
+		print("ATTACK: Fool me once")
 		for neighbour in board.graph.get_adjacent_nodes(attacker.get_id()):
 			if board.graph.get_node(neighbour).get_ownership() != attacker.get_ownership():
-				attackables.append(board.graph.get_node(neighbour))
-		if attackables.is_empty():
-			_parent.skip_stage()
-			return
-		attacked = attackables.pick_random()
+				attackable.append(board.graph.get_node(neighbour))
+	print("ATTACK: Shame on you")
+	if attackable.is_empty():
+		print("ATTACK: Fool me twice")
+		_parent.skip_stage()
+		return
+	
+	var attacked = attackable.pick_random()
 	
 	if null in [attacker, attacked]:
 		_parent.skip_stage()
 		return
-		
+	print("ATTACK: Shame on you")
 	_parent.handle_selecting_attacker(attacker)
 	_parent.handle_select_attacked(attacked)
 

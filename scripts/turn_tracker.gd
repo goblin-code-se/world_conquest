@@ -3,19 +3,19 @@ Queue used for ordering of turns implemented with array
 """
 class_name TurnTracker
 
-var _players: Array[Player]
+var _players
 var _pointer: int
 
-func _init(arr: Array[Player]):
+func _init(arr):
 	_players = arr
 	_pointer = 0
 	
-func peek() -> Player:
+func peek():
 	return _players[_pointer]
 
-func next() -> Player:
+func next():
 	_pointer = (_pointer + 1) % 5 # Wraparound logic for iteration over queue
 	return _players[_pointer]
 
-func get_all() -> Array[Player]:
+func get_all():
 	return _players

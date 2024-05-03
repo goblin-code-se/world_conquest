@@ -5,6 +5,7 @@ class_name Player
 
 var _id: int
 var _troops: int
+var _name: String
 var _cards: Array
 var _conquered_one: bool = false
 var _initial_troop_hand: int
@@ -156,7 +157,6 @@ func award_extra_troops_if_territory_owned(board: Board, traded_cards: Array) ->
 	var territories_to_award = [] 
 	
 	print(owned_territories)
-	
 	
 	for card in traded_cards:
 		for territory in owned_territories:

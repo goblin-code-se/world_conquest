@@ -1,7 +1,7 @@
 extends Node2D
 class_name Territory
 
-var _owner: Player
+var _owner
 var _troop_number: int
 var _hover: bool
 var _selected: bool = false
@@ -40,10 +40,10 @@ func update_info() -> void:
 	graph_id: {2}".format([get_continent(), player_name, str(_graph_id)])
 	$TerritoryName.text = self.get_name()
 
-func get_ownership() -> Player:
+func get_ownership():
 	return _owner
 
-func set_ownership(player: Player) -> void:
+func set_ownership(player) -> void:
 	_owner = player
 	update_info()
 	update_sprite()

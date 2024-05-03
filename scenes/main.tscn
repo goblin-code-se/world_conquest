@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://dyr84av8mpvwn"]
+[gd_scene load_steps=7 format=3 uid="uid://dyr84av8mpvwn"]
 
 [ext_resource type="PackedScene" uid="uid://wjitd0lowq3q" path="res://scenes/board.tscn" id="1_3qqcc"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_mj1yr"]
 [ext_resource type="PackedScene" uid="uid://c6fbusm8pft11" path="res://scenes/ui.tscn" id="2_stmw1"]
 [ext_resource type="Script" path="res://scripts/ai.gd" id="4_k7n5n"]
+[ext_resource type="PackedScene" uid="uid://31ga2n4vc2lr" path="res://scenes/dice_scene.tscn" id="5_711ii"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_1saa1"]
+viewport_path = NodePath("TextureRect/SubViewport")
 
 [node name="Main" type="Node"]
 script = ExtResource("1_mj1yr")
@@ -22,6 +26,32 @@ visible = false
 z_index = 1
 points = PackedVector2Array(0, 0, 100, 100)
 default_color = Color(0, 1, 0, 1)
+begin_cap_mode = 1
+end_cap_mode = 2
+
+[node name="AiTimer" type="Timer" parent="."]
+
+[node name="Broadcast" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Broadcasts"
+
+[node name="BroadcastTimer" type="Timer" parent="."]
+
+[node name="TextureRect" type="TextureRect" parent="."]
+z_index = 15
+offset_left = 3.0
+offset_top = 632.0
+offset_right = 323.0
+offset_bottom = 952.0
+texture = SubResource("ViewportTexture_1saa1")
+stretch_mode = 4
+
+[node name="SubViewport" type="SubViewport" parent="TextureRect"]
+transparent_bg = true
+size = Vector2i(320, 320)
+
+[node name="DiceRoll" parent="TextureRect/SubViewport" instance=ExtResource("5_711ii")]
 
 [connection signal="territory_clicked" from="Board" to="." method="_on_board_territory_clicked"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_turn_timer_timeout"]

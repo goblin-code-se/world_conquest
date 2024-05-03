@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgcng6aycwr7a"]
+
+[ext_resource type="Script" path="res://scripts/win.gd" id="1_jc7yi"]
+
+[node name="Win" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jc7yi")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.00392157, 0.0745098, 0.419608)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CenterContainer"]
+custom_minimum_size = Vector2(595, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/bold_font_size = 73
+bbcode_enabled = true
+text = "[wave][b][u]PLAYER LONGNAMELONGNAME WINS[/u][/b][/wave]"
+fit_content = true
+autowrap_mode = 0
